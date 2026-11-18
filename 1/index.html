@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pengenalan Robotika &amp; Elektronika</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f6fc;--ink:#0f172a;--mute:#51607a;--line:#dfe6f1;--blue:#2563eb;--blue2:#dbe7ff;--teal:#0d9488;--teal2:#d5f5ef;--orange:#f97316;--orange2:#ffe8d6;--pink:#ec4899;--pink2:#fde4f1;--purple:#7c3aed;--purple2:#ece4ff;--amber:#f59e0b;--green:#16a34a;--red:#dc2626;
+--sans:'Plus Jakarta Sans','Segoe UI',system-ui,-apple-system,Roboto,sans-serif;--mono:'JetBrains Mono',ui-monospace,Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#e9eef8;color:var(--ink);font-family:var(--sans)}
+svg *{transform-box:fill-box;transform-origin:center}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center;background:linear-gradient(135deg,#f9fbff,#eef3fc);overflow:hidden;box-shadow:0 30px 80px -30px rgba(30,58,138,.35)}
+#stage::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 92% 8%,rgba(37,99,235,.10),transparent 40%),radial-gradient(circle at 5% 95%,rgba(249,115,22,.10),transparent 38%),radial-gradient(#cfd9ea 1.2px,transparent 1.2px);background-size:auto,auto,28px 28px}
+.slide{position:absolute;inset:0;padding:46px 72px 64px;opacity:0;visibility:hidden}
+.slide.active{opacity:1;visibility:visible;transition:opacity .45s}
+
+/* ===== Entrance animations ===== */
+.active .a{animation:rise .7s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--d,0)*.13s + .1s)}
+.active .a.l{animation-name:fromL}.active .a.r{animation-name:fromR}.active .a.z{animation-name:zoom}
+@keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes fromL{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:none}}
+@keyframes fromR{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:none}}
+@keyframes zoom{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+
+/* ===== Loop animations (only while slide active) ===== */
+.active .float{animation:float 3.2s ease-in-out infinite}@keyframes float{50%{transform:translateY(-12px)}}
+.active .pulse{animation:pulse 1.6s ease-in-out infinite}@keyframes pulse{50%{transform:scale(1.18);opacity:.8}}
+.active .spin{animation:spin 1.4s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.active .flow{animation:flow 1s linear infinite}@keyframes flow{to{stroke-dashoffset:-36}}
+.active .blink{animation:blink 4s infinite}@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.active .wave{animation:wave 1.4s ease-in-out infinite}svg .wave{transform-origin:50% 6%}@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-42deg)}}
+.active .bob{animation:bob 2.6s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-8px) rotate(-5deg)}}
+.active .ring{animation:ring 1.8s ease-out infinite}@keyframes ring{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.3);opacity:0}}
+.active .ledb{animation:ledb 2s steps(1) infinite}@keyframes ledb{0%{fill:#fb923c}50%{fill:#7c2d12}}
+.active .ledb2{animation:ledb2 1.6s ease-in-out infinite}@keyframes ledb2{50%{opacity:.25}}
+
+/* ===== Typography & components ===== */
+.head{margin-bottom:22px}
+.kick{display:inline-flex;align-items:center;gap:8px;font:700 13px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--blue);background:var(--blue2);padding:8px 14px;border-radius:99px;margin-bottom:12px}
+h1{font-size:68px;line-height:1.06;font-weight:800;letter-spacing:-.03em}
+h2{font-size:38px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+h2 em,h1 em{font-style:normal;color:var(--blue)}
+.grad{background:linear-gradient(90deg,var(--blue),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--mute);font-size:20px;line-height:1.5;margin-top:10px}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px 20px;box-shadow:0 10px 24px -14px rgba(30,64,175,.28);transition:transform .25s,box-shadow .25s}
+.card:hover{transform:translateY(-5px);box-shadow:0 18px 30px -14px rgba(30,64,175,.35)}
+.card h3{font-size:21px;font-weight:700;margin-bottom:6px}
+.card p,.card li{font-size:16.5px;line-height:1.5;color:var(--mute)}
+.card ul{padding-left:20px}.card li{margin:3px 0}
+.card b,.sub b,.note b{color:var(--ink)}
+.g{display:grid;gap:18px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.row{display:flex;gap:26px;align-items:flex-start}.col{flex:1;min-width:0}
+.ico{--ic:var(--blue);--icbg:var(--blue2);display:grid;place-items:center;width:50px;height:50px;border-radius:14px;margin-bottom:10px;background:var(--icbg);color:var(--ic)}
+.ico .bi{width:27px;height:27px}.ico.sm{width:40px;height:40px;border-radius:12px;margin-bottom:8px}.ico.sm .bi{width:22px;height:22px}
+.g>.card:nth-child(5n+2)>.ico{--ic:var(--teal);--icbg:var(--teal2)}.g>.card:nth-child(5n+3)>.ico{--ic:var(--orange);--icbg:var(--orange2)}
+.g>.card:nth-child(5n+4)>.ico{--ic:var(--purple);--icbg:var(--purple2)}.g>.card:nth-child(5n+5)>.ico{--ic:var(--pink);--icbg:var(--pink2)}
+.ic-b{--ic:var(--blue);--icbg:var(--blue2)}.ic-t{--ic:var(--teal);--icbg:var(--teal2)}.ic-o{--ic:var(--orange);--icbg:var(--orange2)}.ic-p{--ic:var(--purple);--icbg:var(--purple2)}.ic-k{--ic:var(--pink);--icbg:var(--pink2)}
+svg.i{width:1.05em;height:1.05em;display:inline-block;vertical-align:-.17em;margin-right:.4em;flex:none}
+.rate{display:inline-flex;gap:4px;vertical-align:middle;margin-right:9px}.rate i{width:10px;height:10px;border-radius:50%;background:#cbd5e1}.rate i.on{background:var(--blue)}
+.mono{font-family:var(--mono)}
+.tag{display:inline-block;font:700 12.5px/1 var(--mono);padding:6px 10px;border-radius:99px;background:var(--blue2);color:var(--blue);margin:6px 6px 0 0}
+.tag.o{background:var(--orange2);color:#c2410c}.tag.t{background:var(--teal2);color:#0f766e}.tag.p{background:var(--purple2);color:#6d28d9}.tag.k{background:var(--pink2);color:#be185d}
+kbd{font:700 14px var(--mono);background:#fff;border:1px solid var(--line);border-bottom-width:3px;border-radius:8px;padding:3px 9px}
+.note{background:#fff7ed;border:1px solid #fed7aa;border-left:6px solid var(--orange);border-radius:14px;padding:12px 16px;font-size:16px;line-height:1.5;color:#7c2d12}
+.note.b{background:#eff6ff;border-color:#bfdbfe;border-left-color:var(--blue);color:#1e3a8a}
+.formula{font:700 34px var(--mono);color:var(--blue);background:#fff;border:2px dashed #93b4f8;border-radius:18px;padding:14px 24px;text-align:center}
+svg text{font-family:var(--sans)}
+
+/* ===== Cover ===== */
+.cover{display:flex;align-items:center;gap:20px}
+.cov-l{flex:1.15}.cov-r{flex:.85;height:100%;display:flex;align-items:center;justify-content:center}.cov-r svg{height:540px}
+.cover h1{margin:6px 0 16px}.cover .sub{max-width:560px;font-size:21px}
+.chips{margin-top:18px}.chips span{display:inline-block;margin:0 8px 8px 0;font:700 14px var(--mono);padding:9px 15px;border-radius:99px;background:#fff;border:1px solid var(--line);color:var(--mute)}
+.hint{margin-top:22px;color:var(--mute);font-size:16px}
+/* DRC brand (cover) */
+.brand{position:absolute;left:72px;top:34px;display:flex;align-items:center;gap:16px;z-index:2}
+.logo-slot{width:64px;height:64px;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:0 10px 24px -14px rgba(30,64,175,.4);display:grid;place-items:center;overflow:hidden;padding:5px}
+.logo-slot img{width:100%;height:100%;object-fit:contain;display:block}
+.logo-slot.nologo{background:linear-gradient(135deg,var(--blue),#1e3a8a);border:0;padding:0}
+.logo-slot.nologo img{display:none}
+.logo-slot.nologo::after{content:"DRC";font:800 20px var(--mono);letter-spacing:.04em;color:#fff}
+.brand+.cov-l{padding-top:48px}
+.brand-sep{width:2px;height:44px;border-radius:2px;background:var(--line)}
+.brand-txt{display:flex;flex-direction:column;gap:5px}
+.brand-txt b{font:800 32px/1 var(--sans);letter-spacing:.04em;color:var(--ink)}
+.brand-txt span{font:700 16px/1 var(--sans);letter-spacing:.02em;color:var(--blue)}
+
+/* ===== Agenda ===== */
+.ag{display:flex;gap:16px;align-items:center}
+.ag .n{font:800 34px var(--mono);color:var(--blue);min-width:56px}
+.ag h3{font-size:20px;margin:0}.ag p{font-size:15px}
+
+/* ===== Flow row ===== */
+.flowrow{display:flex;align-items:center;gap:10px}
+.node{background:#fff;border:2px solid var(--line);border-radius:22px;padding:20px 18px;text-align:center;width:260px;box-shadow:0 10px 24px -14px rgba(30,64,175,.3)}
+.node .ico{width:72px;height:72px;border-radius:20px;margin:0 auto 12px}.node .ico .bi{width:38px;height:38px}.node h3{font-size:24px;margin-bottom:6px}.node p{font-size:16px;color:var(--mute);line-height:1.45}
+.active .node{animation:glow 3.6s infinite}
+@keyframes glow{0%,30%{box-shadow:0 0 0 5px rgba(37,99,235,.28);border-color:var(--blue);transform:translateY(-8px)}40%,100%{box-shadow:0 10px 24px -14px rgba(30,64,175,.3);border-color:var(--line);transform:none}}
+.conn{flex:1;height:4px;background:repeating-linear-gradient(90deg,#cbd5e1 0 10px,transparent 10px 18px);position:relative;border-radius:2px;min-width:30px}
+.conn::after{content:"";position:absolute;top:-5px;left:0;width:14px;height:14px;border-radius:50%;background:var(--orange);opacity:0}
+.active .conn::after{animation:travel 1.8s linear infinite}
+@keyframes travel{0%{left:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{left:calc(100% - 14px);opacity:0}}
+.pill{background:#fff;border:2px solid var(--line);border-radius:18px;padding:12px 16px;text-align:center;font-weight:700;font-size:18px;line-height:1.3}
+.pill svg.i{width:20px;height:20px;vertical-align:-.2em}.pill small{display:block;font-weight:500;font-size:13.5px;color:var(--mute);margin-top:3px}
+.pill.hl{background:var(--blue);border-color:var(--blue);color:#fff}
+.pill.hl small{color:#dbe7ff}
+
+/* ===== Color code ===== */
+.cc{display:inline-flex;flex-direction:column;align-items:center;gap:6px;font:700 13px var(--mono);color:var(--mute)}
+.cc i{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:800 16px var(--mono);font-style:normal;color:#fff;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
+
+/* ===== Code ===== */
+.code{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px 8px;font:500 17px/1.7 var(--mono);box-shadow:0 10px 24px -14px rgba(30,64,175,.28)}
+.ln{white-space:pre}.hlb{padding:0 16px;border-radius:8px;margin:0 6px}
+.k{color:#7c3aed;font-weight:700}.f{color:#2563eb}.nm{color:#ea580c}.c{color:#94a3b8;font-style:italic}
+.active .h0,.active .h1,.active .h2,.active .h3{animation:hl 4s infinite}
+.active .h1{animation-delay:1s}.active .h2{animation-delay:2s}.active .h3{animation-delay:3s}
+@keyframes hl{0%{background:#dbeafe}24%{background:#dbeafe}25%,100%{background:transparent}}
+.active .bulb{animation:bulb 4s steps(1) infinite}
+@keyframes bulb{0%{fill:#facc15;filter:drop-shadow(0 0 22px #facc15)}50%{fill:#e2e8f0;filter:none}}
+.active .lblH{animation:lblH 4s steps(1) infinite}@keyframes lblH{0%{opacity:1}50%{opacity:0}}
+.active .lblL{animation:lblL 4s steps(1) infinite}@keyframes lblL{0%{opacity:0}50%{opacity:1}}
+
+/* ===== Diode ===== */
+.active .dF{animation:dotF 2s linear infinite}@keyframes dotF{0%{transform:translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateX(250px);opacity:0}}
+.active .dR{animation:dotR 2s linear infinite}@keyframes dotR{0%{transform:translateX(0);opacity:0}10%{opacity:1}85%{opacity:1}100%{transform:translateX(-84px);opacity:0}}
+.active .lampOn{animation:lampOn 1.2s ease-in-out infinite}@keyframes lampOn{50%{filter:drop-shadow(0 0 16px #facc15)}}
+.active .xblink{animation:xb 1.2s steps(1) infinite}@keyframes xb{50%{opacity:.25}}
+
+/* ===== Transistor ===== */
+.active .onoff{animation:onoff 5s steps(1) infinite}@keyframes onoff{0%{opacity:0}50%{opacity:1}}
+.active .offl{animation:offl 5s steps(1) infinite}@keyframes offl{0%{opacity:1}50%{opacity:0}}
+.active .onl{animation:onoff 5s steps(1) infinite}
+.active .mot{animation:mot 5s ease-in infinite}@keyframes mot{0%,50%{transform:rotate(0)}100%{transform:rotate(1440deg)}}
+.active .bdot{animation:bdot 1s linear infinite}@keyframes bdot{from{transform:translateX(0)}to{transform:translateX(60px)}}
+
+/* ===== Draw curves ===== */
+.active .draw{stroke-dasharray:1000;animation:draw 4.5s ease-in-out infinite}
+@keyframes draw{0%{stroke-dashoffset:1000;opacity:1}60%{stroke-dashoffset:0}90%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+.active .chg{animation:chg 4s ease-out infinite}@keyframes chg{0%{opacity:0;transform:scale(.4)}15%,85%{opacity:1;transform:none}100%{opacity:0}}
+
+/* ===== Ultrasonic ===== */
+.active .wv{animation:wv 3s ease-out infinite}@keyframes wv{0%{transform:translateX(0) scaleY(.6);opacity:0}8%{opacity:1}48%{transform:translateX(370px) scaleY(1.5);opacity:1}50%,100%{transform:translateX(370px);opacity:0}}
+.active .ec{animation:ec 3s ease-in infinite}@keyframes ec{0%,50%{transform:translateX(370px) scaleY(1.4);opacity:0}52%{opacity:1}92%{transform:translateX(0) scaleY(.7);opacity:1}100%{transform:translateX(0);opacity:0}}
+
+/* ===== Chip pins ===== */
+.active .pin{animation:pinp 2.4s infinite}@keyframes pinp{0%,100%{fill:#94a3b8}50%{fill:#f97316}}
+
+/* ===== Table ===== */
+.tbl{display:grid;gap:7px}
+.tr{display:grid;grid-template-columns:230px 1fr 1fr;gap:10px}
+.tr>div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px 16px;font-size:16.5px;line-height:1.35}
+.tr>div:first-child{font-weight:700;background:#f1f5fb}
+.tr.th>div{font-weight:800;font-size:19px;color:#fff;border:0}
+.tr.th>div:nth-child(1){background:transparent}.tr.th>div:nth-child(2){background:var(--teal)}.tr.th>div:nth-child(3){background:var(--blue)}
+
+/* ===== Sensor mini ===== */
+.mini{display:flex;gap:18px;align-items:center;padding:34px 24px}
+.mini svg{flex:none;width:136px;height:108px}
+.mini h3{font-size:23px;margin-bottom:6px}.mini p{font-size:16.5px;line-height:1.5}
+.active .sunr{animation:spin 6s linear infinite}
+.active .merc{animation:merc 3s ease-in-out infinite}@keyframes merc{0%,100%{transform:scaleY(.2)}50%{transform:scaleY(1)}}svg .merc{transform-origin:50% 100%}
+.active .walk{animation:walk 2.4s ease-in-out infinite alternate}@keyframes walk{from{transform:translateX(-26px)}to{transform:translateX(26px)}}
+.active .tilt{animation:tilt 3s ease-in-out infinite}@keyframes tilt{0%,100%{transform:rotate(-28deg)}50%{transform:rotate(28deg)}}
+.active .bub{animation:bub 2.4s ease-in infinite}@keyframes bub{0%{transform:translateY(0);opacity:0}20%{opacity:.9}100%{transform:translateY(-44px);opacity:0}}
+.active .beam{animation:beam 1.2s ease-in-out infinite}@keyframes beam{50%{opacity:.25}}
+
+/* ===== Actuators ===== */
+.active .sweep{animation:sweep 3s ease-in-out infinite alternate}@keyframes sweep{from{transform:rotate(-75deg)}to{transform:rotate(75deg)}}
+.active .stepr{animation:stepr 4s steps(8) infinite}@keyframes stepr{to{transform:rotate(360deg)}}
+.active .dcm{animation:spin 1s linear infinite}
+
+/* ===== Comms ===== */
+.link{display:flex;align-items:center;gap:10px;margin:10px 0 14px;height:84px}
+.nb{font:700 12px var(--mono);background:#e2e8f0;border-radius:10px;padding:10px 9px;color:#334155;text-align:center;line-height:1.3}
+.wires{flex:1;display:flex;flex-direction:column;gap:19px;justify-content:center}
+.w{position:relative;height:3px;background:#cbd5e1;border-radius:2px}
+.w::before{content:attr(data-l);position:absolute;left:0;top:-14px;font:700 10px var(--mono);color:#64748b}
+.w::after{content:"";position:absolute;top:-4px;left:0;width:11px;height:11px;border-radius:50%;background:var(--blue);opacity:0}
+.active .w::after{animation:t2 1.6s linear infinite}
+.w.r::after{background:var(--orange)}.active .w.r::after{animation-name:t2r}
+@keyframes t2{0%{left:0;opacity:0}12%{opacity:1}88%{opacity:1}100%{left:calc(100% - 11px);opacity:0}}
+@keyframes t2r{0%{left:calc(100% - 11px);opacity:0}12%{opacity:1}88%{opacity:1}100%{left:0;opacity:0}}
+.wf{flex:1;display:grid;place-items:center;color:var(--blue)}.wf .bi{width:42px;height:42px}
+.active .wf{animation:pulse 1.4s infinite}
+
+/* ===== Timeline ===== */
+.tl{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:10px 0 26px}
+.tl .track{position:absolute;left:8%;right:8%;top:30px;height:6px;border-radius:3px;background:#dbe3f0}
+.tl .fill{position:absolute;left:8%;right:8%;top:30px;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--teal),var(--orange))}
+.active .tl .fill{animation:fillw 3.6s ease-out .3s backwards}@keyframes fillw{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.st{text-align:center;position:relative}
+.st .dot{width:62px;height:62px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;font:800 24px var(--mono);color:#fff;background:var(--blue);border:5px solid #fff;box-shadow:0 8px 18px -6px rgba(37,99,235,.5)}
+.st:nth-child(3) .dot{background:var(--teal)}.st:nth-child(4) .dot{background:var(--purple)}.st:nth-child(5) .dot{background:var(--pink)}.st:nth-child(6) .dot{background:var(--orange)}.st:nth-child(7) .dot{background:var(--green)}
+.st h3{font-size:17.5px;margin-bottom:4px}.st p{font-size:14.5px;color:var(--mute);line-height:1.4}
+
+/* ===== Rules ===== */
+.rule{display:flex;gap:14px;align-items:flex-start}
+.rule .b{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;flex:none;background:var(--blue2);color:var(--blue)}.rule .b .bi{width:22px;height:22px}
+.rule:nth-child(5n+2) .b{background:var(--teal2);color:var(--teal)}.rule:nth-child(5n+3) .b{background:var(--orange2);color:var(--orange)}.rule:nth-child(5n+4) .b{background:var(--purple2);color:var(--purple)}.rule:nth-child(5n+5) .b{background:var(--pink2);color:var(--pink)}
+.rule h3{font-size:18px;margin:0 0 2px}.rule p{font-size:15px;line-height:1.4}
+
+/* ===== UI ===== */
+#progress{position:fixed;top:0;left:0;right:0;height:5px;background:rgba(15,23,42,.06);z-index:10}
+#progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--teal),var(--orange));transition:width .4s}
+#ctrl{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.93);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:99px;padding:6px 12px;box-shadow:0 10px 30px -10px rgba(15,23,42,.3);z-index:10;transition:opacity .4s;font:700 14px var(--mono);color:var(--mute)}
+#ctrl button{all:unset;cursor:pointer;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:700 22px var(--sans);color:var(--ink);background:#eef2fb;transition:background .2s,transform .2s}
+#ctrl button:hover{background:var(--blue2);color:var(--blue);transform:scale(1.08)}
+#count{min-width:68px;text-align:center}
+#ctrl button svg{width:19px;height:19px}
+body.fs.idle #ctrl{opacity:0;pointer-events:none}body.fs.idle{cursor:none}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true"><defs><symbol id="i-eye" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></g></symbol><symbol id="i-cpu" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M19 9h3M19 15h3M2 9h3M2 15h3"/></g></symbol><symbol id="i-move" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></g></symbol><symbol id="i-gear" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.59,4.74L10.78,2.07L13.22,2.07L13.41,4.74A7.4,7.4 0 0 1 16.14,5.87L18.16,4.12L19.88,5.84L18.13,7.86A7.4,7.4 0 0 1 19.26,10.59L21.93,10.78L21.93,13.22L19.26,13.41A7.4,7.4 0 0 1 18.13,16.14L19.88,18.16L18.16,19.88L16.14,18.13A7.4,7.4 0 0 1 13.41,19.26L13.22,21.93L10.78,21.93L10.59,19.26A7.4,7.4 0 0 1 7.86,18.13L5.84,19.88L4.12,18.16L5.87,16.14A7.4,7.4 0 0 1 4.74,13.41L2.07,13.22L2.07,10.78L4.74,10.59A7.4,7.4 0 0 1 5.87,7.86L4.12,5.84L5.84,4.12L7.86,5.87A7.4,7.4 0 0 1 10.59,4.74Z"/><circle cx="12" cy="12" r="3"/></g></symbol><symbol id="i-battery" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="16" height="10" rx="2"/><path d="M22 11v2"/><path d="M6 11v2M10 11v2M14 11v2"/></g></symbol><symbol id="i-factory" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><path d="M17 18h1M12 18h1M7 18h1"/></g></symbol><symbol id="i-heart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></g></symbol><symbol id="i-home" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></g></symbol><symbol id="i-sprout" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></g></symbol><symbol id="i-rocket" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></g></symbol><symbol id="i-trophy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></g></symbol><symbol id="i-zap" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></g></symbol><symbol id="i-waves" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></g></symbol><symbol id="i-resistor" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l2-6 4 12 4-12 2 6h5"/></g></symbol><symbol id="i-alert" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></g></symbol><symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></g></symbol><symbol id="i-ban" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></g></symbol><symbol id="i-grid" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></g></symbol><symbol id="i-dot" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3.5"/></g></symbol><symbol id="i-gauge" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14l4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></g></symbol><symbol id="i-toggle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="5" width="22" height="14" rx="7"/><circle cx="16" cy="12" r="3"/></g></symbol><symbol id="i-volume" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></g></symbol><symbol id="i-thermo" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></g></symbol><symbol id="i-scan" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></g></symbol><symbol id="i-distance" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5v14M21 5v14M3 12h18"/><path d="M7 8l-4 4 4 4M17 8l4 4-4 4"/></g></symbol><symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></g></symbol><symbol id="i-activity" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></g></symbol><symbol id="i-route" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></g></symbol><symbol id="i-mic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></g></symbol><symbol id="i-wind" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></g></symbol><symbol id="i-compass" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16.2 7.8l-2 6.3-6.4 2.1 2-6.3z"/></g></symbol><symbol id="i-wifi" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><path d="M12 20h.01"/></g></symbol><symbol id="i-link" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></symbol><symbol id="i-polar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8M2 7h8"/><path d="M14 17h8"/><path d="M19 3L5 21"/></g></symbol><symbol id="i-plug" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8z"/></g></symbol><symbol id="i-clipcheck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 14l2 2 4-4"/></g></symbol><symbol id="i-bulb" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6M10 22h4"/></g></symbol><symbol id="i-car" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></g></symbol><symbol id="i-bluetooth" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></g></symbol><symbol id="i-sine" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2.2 0 2.6-7 5-7s2.8 14 5 14 2.6-7 5-7h5"/></g></symbol><symbol id="i-square" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h5V6h5v12h5V6h5"/></g></symbol><symbol id="i-maximize" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></g></symbol></defs></svg>
+<div id="progress"><i></i></div>
+
+<div id="stage">
+
+<!-- 1. COVER -->
+<section class="slide cover">
+  <div class="brand a" style="--d:0">
+    <span class="logo-slot"><img src="logo-drc.png" alt="Logo DRC" onerror="this.parentNode.classList.add('nologo')"></span>
+    <span class="brand-sep"></span>
+    <div class="brand-txt"><b>DRC</b><span>Dinus Robotic Club</span></div>
+  </div>
+  <div class="cov-l">
+    <span class="kick a" style="--d:0">Workshop Dasar · Pemula</span>
+    <h1 class="a" style="--d:1">Pengenalan<br><span class="grad">Robotika</span> &amp;<br>Elektronika</h1>
+    <p class="sub a" style="--d:2">Dari resistor, dioda, Arduino, ESP32 sampai berbagai jenis sensor — fondasi untuk membuat robot pertamamu.</p>
+    <div class="chips a" style="--d:3"><span>Komponen</span><span>Arduino</span><span>ESP32</span><span>Sensor</span><span>Aktuator</span></div>
+    <p class="hint a" style="--d:4">Tekan <kbd>→</kbd> untuk mulai · <kbd>F</kbd> layar penuh</p>
+  </div>
+  <div class="cov-r a z" style="--d:2"><svg data-robot viewBox="0 0 420 480"></svg></div>
+</section>
+
+<!-- 2. AGENDA -->
+<section class="slide">
+  <div class="head"><span class="kick a">Agenda</span><h2 class="a" style="--d:1">Yang akan kita <em>pelajari</em> hari ini</h2></div>
+  <div class="g g2" style="gap:16px">
+    <div class="card ag a l" style="--d:2"><span class="n">01</span><div><h3>Dasar Robotika</h3><p>Apa itu robot &amp; bagian-bagiannya</p></div></div>
+    <div class="card ag a r" style="--d:2"><span class="n" style="color:var(--teal)">02</span><div><h3>Listrik &amp; Hukum Ohm</h3><p>Tegangan, arus, hambatan</p></div></div>
+    <div class="card ag a l" style="--d:3"><span class="n" style="color:var(--purple)">03</span><div><h3>Resistor &amp; Kapasitor</h3><p>Pembatas arus &amp; penyimpan muatan</p></div></div>
+    <div class="card ag a r" style="--d:3"><span class="n" style="color:var(--pink)">04</span><div><h3>Dioda, LED &amp; Transistor</h3><p>Katup satu arah &amp; saklar elektronik</p></div></div>
+    <div class="card ag a l" style="--d:4"><span class="n" style="color:var(--orange)">05</span><div><h3>Mikrokontroler &amp; Arduino</h3><p>Otak robot + contoh kode pertama</p></div></div>
+    <div class="card ag a r" style="--d:4"><span class="n" style="color:var(--blue)">06</span><div><h3>ESP32</h3><p>WiFi &amp; Bluetooth untuk IoT</p></div></div>
+    <div class="card ag a l" style="--d:5"><span class="n" style="color:var(--teal)">07</span><div><h3>Sensor</h3><p>Jenis, cara kerja, analog vs digital</p></div></div>
+    <div class="card ag a r" style="--d:5"><span class="n" style="color:var(--purple)">08</span><div><h3>Aktuator, Daya &amp; Proyek</h3><p>Motor, servo, keselamatan, roadmap</p></div></div>
+  </div>
+</section>
+
+<!-- 3. APA ITU ROBOT -->
+<section class="slide">
+  <div class="head"><span class="kick a">Dasar Robotika</span><h2 class="a" style="--d:1">Apa itu <em>robot</em>?</h2>
+    <p class="sub a" style="--d:2;max-width:980px">Robot adalah mesin yang dapat <b>merasakan</b> lingkungannya, <b>mengambil keputusan</b>, lalu <b>bertindak</b> — secara otomatis maupun dengan kendali manusia.</p></div>
+  <div class="flowrow" style="margin-top:34px">
+    <div class="a z" style="--d:3"><div class="node"><span class="ico bob ic-b"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-eye"/></svg></span><h3>1 · Sense</h3><p>Sensor membaca jarak, cahaya, suhu, sentuhan</p></div></div>
+    <div class="conn a" style="--d:4"></div>
+    <div class="a z" style="--d:4"><div class="node" style="animation-delay:1.2s"><span class="ico bob ic-t" style="animation-delay:.3s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-cpu"/></svg></span><h3>2 · Think</h3><p>Mikrokontroler menjalankan program &amp; logika</p></div></div>
+    <div class="conn a" style="--d:5"></div>
+    <div class="a z" style="--d:5"><div class="node" style="animation-delay:2.4s"><span class="ico bob ic-o" style="animation-delay:.6s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-move"/></svg></span><h3>3 · Act</h3><p>Aktuator menggerakkan roda, lengan, atau gripper</p></div></div>
+  </div>
+  <div class="note b a" style="--d:7;margin-top:34px"><b>Contoh:</b> robot penghindar rintangan — sensor ultrasonik mengukur jarak 15 cm → Arduino memutuskan “belok kanan” → motor roda berputar berlawanan arah.</div>
+</section>
+
+<!-- 4. APLIKASI -->
+<section class="slide">
+  <div class="head"><span class="kick a">Dasar Robotika</span><h2 class="a" style="--d:1">Robot ada di <em>sekitar kita</em></h2></div>
+  <div class="g g3">
+    <div class="card a" style="--d:2"><span class="ico bob"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-factory"/></svg></span><h3>Industri</h3><p>Lengan robot merakit mobil, mengelas, dan mengepak barang 24 jam.</p></div>
+    <div class="card a" style="--d:3"><span class="ico bob" style="animation-delay:.3s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg></span><h3>Medis</h3><p>Robot bedah presisi tinggi dan robot pengantar obat di rumah sakit.</p></div>
+    <div class="card a" style="--d:4"><span class="ico bob" style="animation-delay:.6s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-home"/></svg></span><h3>Rumah Tangga</h3><p>Penyedot debu otomatis, pemotong rumput, dan asisten pintar.</p></div>
+    <div class="card a" style="--d:5"><span class="ico bob" style="animation-delay:.9s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sprout"/></svg></span><h3>Pertanian</h3><p>Drone penyemprot, penyiram otomatis, dan pemanen buah.</p></div>
+    <div class="card a" style="--d:6"><span class="ico bob" style="animation-delay:1.2s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-rocket"/></svg></span><h3>Eksplorasi</h3><p>Rover di Mars, robot bawah laut, dan robot penyelamat bencana.</p></div>
+    <div class="card a" style="--d:7"><span class="ico bob" style="animation-delay:1.5s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-trophy"/></svg></span><h3>Pendidikan &amp; Lomba</h3><p>Line follower, sumo robot, dan kontes robot tingkat nasional.</p></div>
+  </div>
+</section>
+
+<!-- 5. ANATOMI -->
+<section class="slide">
+  <div class="head"><span class="kick a">Dasar Robotika</span><h2 class="a" style="--d:1">Anatomi <em>sebuah robot</em></h2></div>
+  <svg viewBox="0 0 1136 430" width="1136" height="430">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f97316"/></marker></defs>
+    <line x1="264" y1="215" x2="422" y2="215" stroke="#f97316" stroke-width="5" stroke-dasharray="6 6" class="flow" marker-end="url(#ah)"/>
+    <line x1="714" y1="215" x2="870" y2="215" stroke="#f97316" stroke-width="5" stroke-dasharray="6 6" class="flow" marker-end="url(#ah)"/>
+    <line x1="568" y1="88" x2="568" y2="154" stroke="#f59e0b" stroke-width="5" stroke-dasharray="6 6" class="flow" marker-end="url(#ah)"/>
+    <line x1="568" y1="272" x2="568" y2="342" stroke="#94a3b8" stroke-width="4" stroke-dasharray="4 8"/>
+    <g class="a z" style="--d:2"><rect x="10" y="170" width="250" height="90" rx="22" fill="#dbe7ff" stroke="#2563eb" stroke-width="3"/><circle cx="50" cy="215" r="25" fill="#fff"/><use href="#i-eye" x="36" y="201" width="28" height="28" style="color:#2563eb"/><text x="166" y="208" text-anchor="middle" font-size="26" font-weight="800" fill="#1e3a8a">Sensor</text><text x="166" y="236" text-anchor="middle" font-size="15" fill="#475569">Ultrasonik · IR · Suhu</text></g>
+    <g class="a z" style="--d:3"><rect x="428" y="160" width="280" height="110" rx="26" fill="#2563eb"/><use href="#i-cpu" x="553" y="170" width="30" height="30" style="color:#fff"/><text x="568" y="228" text-anchor="middle" font-size="28" font-weight="800" fill="#fff">Mikrokontroler</text><text x="568" y="254" text-anchor="middle" font-size="16" fill="#dbe7ff">Arduino · ESP32 (otak)</text></g>
+    <g class="a z" style="--d:4"><rect x="876" y="170" width="250" height="90" rx="22" fill="#ffe8d6" stroke="#f97316" stroke-width="3"/><circle cx="916" cy="215" r="25" fill="#fff"/><use href="#i-move" x="902" y="201" width="28" height="28" style="color:#f97316"/><text x="1038" y="208" text-anchor="middle" font-size="26" font-weight="800" fill="#9a3412">Aktuator</text><text x="1038" y="236" text-anchor="middle" font-size="15" fill="#475569">Motor · Servo · Relay</text></g>
+    <g class="a z" style="--d:5"><rect x="448" y="4" width="240" height="80" rx="20" fill="#fef3c7" stroke="#f59e0b" stroke-width="3"/><circle cx="484" cy="44" r="23" fill="#fff"/><use href="#i-battery" x="471" y="31" width="26" height="26" style="color:#f59e0b"/><text x="604" y="40" text-anchor="middle" font-size="24" font-weight="800" fill="#92400e">Catu Daya</text><text x="604" y="65" text-anchor="middle" font-size="15" fill="#475569">Baterai · Regulator</text></g>
+    <g class="a z" style="--d:6"><rect x="448" y="346" width="240" height="80" rx="20" fill="#d5f5ef" stroke="#0d9488" stroke-width="3"/><circle cx="484" cy="386" r="23" fill="#fff"/><use href="#i-gear" x="471" y="373" width="26" height="26" style="color:#0d9488"/><text x="604" y="382" text-anchor="middle" font-size="24" font-weight="800" fill="#115e59">Mekanik</text><text x="604" y="407" text-anchor="middle" font-size="15" fill="#475569">Rangka · Roda · Gear</text></g>
+  </svg>
+</section>
+
+<!-- 6. LISTRIK DASAR -->
+<section class="slide">
+  <div class="head"><span class="kick a">Elektronika Dasar</span><h2 class="a" style="--d:1">Listrik dasar &amp; <em>Hukum Ohm</em></h2></div>
+  <div class="row">
+    <div style="width:430px;display:grid;gap:14px">
+      <div class="card a l" style="--d:2"><h3 style="color:var(--blue)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-zap"/></svg>Tegangan (V) — Volt</h3><p>“Dorongan” listrik. Seperti tekanan air di dalam pipa.</p></div>
+      <div class="card a l" style="--d:3"><h3 style="color:var(--teal)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-waves"/></svg>Arus (I) — Ampere</h3><p>Jumlah muatan yang mengalir per detik. Seperti debit air.</p></div>
+      <div class="card a l" style="--d:4"><h3 style="color:var(--orange)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-resistor"/></svg>Hambatan (R) — Ohm Ω</h3><p>Penghalang aliran. Seperti pipa yang menyempit.</p></div>
+      <div class="formula a z" style="--d:6">V = I × R</div>
+    </div>
+    <div class="col card a r" style="--d:3;padding:10px">
+      <svg viewBox="0 0 460 300" width="100%">
+        <path d="M60,142 V60 H170 M290,60 H400 V140 M400,200 V240 H60 V160" stroke="#94a3b8" stroke-width="5" fill="none"/>
+        <path d="M60,142 V60 H400 V240 H60 V160" stroke="#f97316" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="1 17" class="flow"/>
+        <rect x="164" y="34" width="132" height="52" rx="8" fill="#fff"/>
+        <path d="M170,60 H182 L190,40 L206,80 L222,40 L238,80 L254,40 L262,60 H290" stroke="#0f172a" stroke-width="4" fill="none" stroke-linejoin="round"/>
+        <text x="230" y="24" text-anchor="middle" font-size="17" font-weight="700" fill="#c2410c">R = 330 Ω</text>
+        <circle class="pulse" cx="400" cy="170" r="40" fill="#fde047" opacity=".55"/>
+        <circle cx="400" cy="170" r="30" fill="#fff" stroke="#0f172a" stroke-width="4"/>
+        <path d="M379,149 L421,191 M421,149 L379,191" stroke="#0f172a" stroke-width="4"/>
+        <text x="340" y="176" text-anchor="end" font-size="16" font-weight="700" fill="#475569">Lampu</text>
+        <rect x="34" y="136" width="52" height="30" fill="#fff"/>
+        <line x1="38" y1="142" x2="82" y2="142" stroke="#0f172a" stroke-width="4"/>
+        <line x1="48" y1="160" x2="72" y2="160" stroke="#0f172a" stroke-width="9"/>
+        <text x="98" y="146" font-size="18" font-weight="800" fill="#dc2626">+</text>
+        <text x="98" y="172" font-size="18" font-weight="800" fill="#2563eb">−</text>
+        <text x="30" y="157" text-anchor="end" font-size="16" font-weight="700" fill="#475569">9 V</text>
+        <text x="230" y="278" text-anchor="middle" font-size="15" fill="#64748b">→ titik oranye = arus (I) mengalir dari kutub + melewati rangkaian</text>
+      </svg>
+      <p style="text-align:center;font-size:16px;margin:4px 0 6px;color:var(--mute)">Contoh: <b>I = 9 V ÷ 330 Ω ≈ 27 mA</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- 7. RESISTOR -->
+<section class="slide">
+  <div class="head"><span class="kick a">Komponen · Pasif</span><h2 class="a" style="--d:1"><em>Resistor</em> — pembatas arus</h2></div>
+  <div class="row">
+    <div style="width:650px">
+      <div class="card a l" style="--d:2;padding:8px 16px">
+        <svg viewBox="0 0 560 190" width="100%">
+          <line x1="0" y1="85" x2="560" y2="85" stroke="#94a3b8" stroke-width="6"/>
+          <line x1="0" y1="85" x2="560" y2="85" stroke="#f97316" stroke-width="6" stroke-linecap="round" stroke-dasharray="1 17" class="flow"/>
+          <rect x="130" y="40" width="300" height="90" rx="42" fill="#ecd9ae" stroke="#cdb27c" stroke-width="3"/>
+          <rect class="a" style="--d:4" x="185" y="41" width="22" height="88" fill="#92400e"/>
+          <rect class="a" style="--d:5" x="235" y="41" width="22" height="88" fill="#111827"/>
+          <rect class="a" style="--d:6" x="285" y="41" width="22" height="88" fill="#dc2626"/>
+          <rect class="a" style="--d:7" x="370" y="41" width="22" height="88" fill="#d4a017"/>
+          <g font-family="JetBrains Mono, monospace" font-size="17" font-weight="700" fill="#334155" text-anchor="middle">
+            <text x="196" y="158">1</text><text x="246" y="158">0</text><text x="296" y="158">×100</text><text x="381" y="158">±5%</text></g>
+          <text x="280" y="182" text-anchor="middle" font-size="15" fill="#64748b">Coklat · Hitam · Merah · Emas = 1.000 Ω = 1 kΩ</text>
+        </svg>
+      </div>
+      <div class="a" style="--d:6;display:flex;gap:9px;justify-content:space-between;margin-top:18px">
+        <span class="cc"><i style="background:#111827">0</i>Hitam</span><span class="cc"><i style="background:#92400e">1</i>Coklat</span><span class="cc"><i style="background:#dc2626">2</i>Merah</span><span class="cc"><i style="background:#f97316">3</i>Oranye</span><span class="cc"><i style="background:#eab308;color:#422006">4</i>Kuning</span><span class="cc"><i style="background:#16a34a">5</i>Hijau</span><span class="cc"><i style="background:#2563eb">6</i>Biru</span><span class="cc"><i style="background:#7c3aed">7</i>Ungu</span><span class="cc"><i style="background:#9ca3af">8</i>Abu</span><span class="cc"><i style="background:#fff;color:#334155;border:2px solid #cbd5e1">9</i>Putih</span>
+      </div>
+      <p class="sub a" style="--d:7;font-size:17px">Satuan: <b>Ω</b> (ohm) · <b>kΩ</b> = 1.000 Ω · <b>MΩ</b> = 1.000.000 Ω. Gelang ke-3 = pengali (×10ⁿ).</p>
+    </div>
+    <div class="col" style="display:grid;gap:14px">
+      <div class="card a r" style="--d:3"><h3>Fungsi utama</h3><ul><li><b>Membatasi arus</b> (misal pada LED)</li><li><b>Pembagi tegangan</b> untuk sensor analog</li><li><b>Pull-up / pull-down</b> pada tombol</li></ul></div>
+      <div class="card a r" style="--d:5;background:#fff7ed"><h3 style="color:#c2410c">Contoh: resistor untuk LED</h3><p class="mono" style="color:var(--ink);font-size:16px;line-height:1.7">R = (Vsumber − Vled) ÷ I<br>R = (5 V − 2 V) ÷ 20 mA<br>R = <b style="color:var(--orange)">150 Ω</b> → pakai <b>220 Ω</b> (aman)</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. KAPASITOR -->
+<section class="slide">
+  <div class="head"><span class="kick a">Komponen · Pasif</span><h2 class="a" style="--d:1"><em>Kapasitor</em> — penyimpan muatan</h2></div>
+  <div class="row">
+    <div class="card a l" style="--d:2;width:560px;padding:8px">
+      <svg viewBox="0 0 520 290" width="100%">
+        <line x1="40" y1="150" x2="150" y2="150" stroke="#94a3b8" stroke-width="6"/><line x1="316" y1="150" x2="440" y2="150" stroke="#94a3b8" stroke-width="6"/>
+        <rect x="150" y="50" width="16" height="200" rx="4" fill="#2563eb"/><rect x="300" y="50" width="16" height="200" rx="4" fill="#ec4899"/>
+        <g stroke="#f97316" stroke-width="4" stroke-dasharray="6 6" class="flow" fill="none"><line x1="172" y1="95" x2="294" y2="95"/><line x1="172" y1="150" x2="294" y2="150"/><line x1="172" y1="205" x2="294" y2="205"/></g>
+        <text x="233" y="36" text-anchor="middle" font-size="15" font-weight="700" fill="#64748b">dielektrik (isolator)</text>
+        <g font-size="26" font-weight="800" fill="#2563eb" text-anchor="middle"><text class="chg" x="132" y="78">+</text><text class="chg" style="animation-delay:.3s" x="132" y="112">+</text><text class="chg" style="animation-delay:.6s" x="132" y="196">+</text><text class="chg" style="animation-delay:.9s" x="132" y="228">+</text></g>
+        <g font-size="30" font-weight="800" fill="#ec4899" text-anchor="middle"><text class="chg" x="338" y="78">−</text><text class="chg" style="animation-delay:.3s" x="338" y="112">−</text><text class="chg" style="animation-delay:.6s" x="338" y="196">−</text><text class="chg" style="animation-delay:.9s" x="338" y="228">−</text></g>
+        <text x="260" y="278" text-anchor="middle" font-size="22" font-weight="800" font-family="JetBrains Mono, monospace" fill="#2563eb">C = Q ÷ V</text>
+      </svg>
+    </div>
+    <div class="col card a r" style="--d:3;padding:10px 14px">
+      <svg viewBox="0 0 360 210" width="100%">
+        <line x1="40" y1="10" x2="40" y2="170" stroke="#64748b" stroke-width="3"/><line x1="40" y1="170" x2="345" y2="170" stroke="#64748b" stroke-width="3"/>
+        <line x1="40" y1="34" x2="345" y2="34" stroke="#f97316" stroke-width="2" stroke-dasharray="6 6"/>
+        <path class="draw" pathLength="1000" d="M40,170 C85,70 140,44 340,36" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
+        <text x="46" y="26" font-size="14" font-weight="700" fill="#c2410c">V sumber</text><text x="30" y="14" text-anchor="end" font-size="15" font-weight="700" fill="#475569">V</text><text x="345" y="158" text-anchor="end" font-size="15" font-weight="700" fill="#475569">waktu (t)</text>
+        <text x="200" y="206" text-anchor="middle" font-size="14" fill="#64748b">Tegangan kapasitor naik perlahan saat diisi (RC)</text>
+      </svg>
+    </div>
+  </div>
+  <div class="g g3" style="margin-top:18px">
+    <div class="card a" style="--d:5"><h3>Fungsi</h3><p>Penyimpan muatan sementara, penyaring noise (decoupling 100 nF dekat IC), perata tegangan, dan pewaktu (RC).</p></div>
+    <div class="card a" style="--d:6"><h3>Satuan</h3><p>Farad (F). Yang umum: <b>pF</b>, <b>nF</b>, <b>µF</b>. Semakin besar nilainya, semakin banyak muatan tersimpan.</p></div>
+    <div class="card a" style="--d:7;background:#fff7ed"><h3 style="color:#c2410c"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-alert"/></svg>Elektrolit</h3><p>Berpolaritas! Kaki panjang = <b>+</b>, jalur putih di badan = <b>−</b>. Jangan dipasang terbalik.</p></div>
+  </div>
+</section>
+
+<!-- 9. DIODA & LED -->
+<section class="slide">
+  <div class="head"><span class="kick a">Komponen · Semikonduktor</span><h2 class="a" style="--d:1"><em>Dioda &amp; LED</em> — katup satu arah</h2></div>
+  <div class="g g2">
+    <div class="card a l" style="--d:2;padding:12px 16px">
+      <h3 style="color:var(--green)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>Forward bias — arus mengalir</h3>
+      <svg viewBox="0 0 400 190" width="100%">
+        <line x1="20" y1="100" x2="380" y2="100" stroke="#94a3b8" stroke-width="5"/>
+        <g fill="#f97316"><circle class="dF" cx="40" cy="100" r="6"/><circle class="dF" style="animation-delay:.5s" cx="40" cy="100" r="6"/><circle class="dF" style="animation-delay:1s" cx="40" cy="100" r="6"/><circle class="dF" style="animation-delay:1.5s" cx="40" cy="100" r="6"/></g>
+        <path d="M150,70 L150,130 L200,100 Z" fill="#2563eb"/><rect x="200" y="68" width="8" height="64" fill="#0f172a"/>
+        <text x="150" y="156" text-anchor="middle" font-size="14" font-weight="700" fill="#475569">Anoda (+)</text><text x="206" y="156" text-anchor="middle" font-size="14" font-weight="700" fill="#475569" dx="30">Katoda (−)</text>
+        <circle class="lampOn" cx="330" cy="100" r="26" fill="#fde047" stroke="#0f172a" stroke-width="4"/><path d="M314,84 L346,116 M346,84 L314,116" stroke="#0f172a" stroke-width="3"/>
+        <text x="330" y="150" text-anchor="middle" font-size="15" font-weight="800" fill="#ca8a04">LED NYALA</text>
+        <text x="20" y="60" font-size="14" fill="#64748b">Baterai</text><text x="76" y="60" font-size="16" font-weight="800" fill="#dc2626">+</text>
+      </svg>
+    </div>
+    <div class="card a r" style="--d:2;padding:12px 16px">
+      <h3 style="color:var(--red)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-ban"/></svg>Reverse bias — arus diblokir</h3>
+      <svg viewBox="0 0 400 190" width="100%">
+        <line x1="20" y1="100" x2="380" y2="100" stroke="#94a3b8" stroke-width="5"/>
+        <g fill="#f97316"><circle class="dR" cx="290" cy="100" r="6"/><circle class="dR" style="animation-delay:.5s" cx="290" cy="100" r="6"/><circle class="dR" style="animation-delay:1s" cx="290" cy="100" r="6"/><circle class="dR" style="animation-delay:1.5s" cx="290" cy="100" r="6"/></g>
+        <path d="M150,70 L150,130 L200,100 Z" fill="#2563eb"/><rect x="200" y="68" width="8" height="64" fill="#0f172a"/>
+        <path class="xblink" d="M226,76 L254,104 M254,76 L226,104" fill="none" stroke="#dc2626" stroke-width="7" stroke-linecap="round"/>
+        <text x="150" y="156" text-anchor="middle" font-size="14" font-weight="700" fill="#475569">Anoda</text><text x="236" y="156" text-anchor="middle" font-size="14" font-weight="700" fill="#475569">Katoda</text>
+        <circle cx="330" cy="100" r="26" fill="#e2e8f0" stroke="#0f172a" stroke-width="4"/><path d="M314,84 L346,116 M346,84 L314,116" stroke="#94a3b8" stroke-width="3"/>
+        <text x="330" y="150" text-anchor="middle" font-size="15" font-weight="800" fill="#64748b">LED MATI</text>
+        <text x="350" y="60" font-size="16" font-weight="800" fill="#dc2626">+</text><text x="300" y="60" font-size="14" fill="#64748b">Baterai</text>
+      </svg>
+    </div>
+  </div>
+  <div class="g g3" style="margin-top:16px">
+    <div class="card a" style="--d:4"><h3>Dioda penyearah</h3><p>1N4007 — ubah AC ke DC &amp; <b>dioda flyback</b> pelindung motor/relay.</p></div>
+    <div class="card a" style="--d:5"><h3>LED</h3><p>Kaki <b>panjang = anoda (+)</b>. Tegangan jatuh ±1,8–3,3 V. <b>Wajib</b> pakai resistor.</p></div>
+    <div class="card a" style="--d:6"><h3>Zener &amp; Schottky</h3><p>Zener menstabilkan tegangan; Schottky cepat &amp; rugi kecil (±0,3 V).</p></div>
+  </div>
+</section>
+
+<!-- 10. TRANSISTOR -->
+<section class="slide">
+  <div class="head"><span class="kick a">Komponen · Semikonduktor</span><h2 class="a" style="--d:1"><em>Transistor</em> — saklar elektronik</h2></div>
+  <div class="row">
+    <div class="card a l" style="--d:2;width:560px;padding:8px">
+      <svg viewBox="0 0 560 350" width="100%">
+        <text x="350" y="16" text-anchor="middle" font-size="16" font-weight="800" fill="#dc2626">+9 V</text>
+        <line x1="350" y1="22" x2="350" y2="38" stroke="#0f172a" stroke-width="4"/>
+        <circle cx="350" cy="76" r="38" fill="#fff" stroke="#0f172a" stroke-width="4"/>
+        <g class="mot" style="transform-origin:350px 76px;transform-box:view-box"><path d="M350,50 V102 M324,76 H376" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/><circle cx="350" cy="76" r="6" fill="#f97316"/></g>
+        <text x="410" y="82" font-size="18" font-weight="800" fill="#334155">Motor</text>
+        <line x1="350" y1="114" x2="350" y2="128" stroke="#0f172a" stroke-width="4"/>
+        <circle cx="322" cy="180" r="62" fill="none" stroke="#0f172a" stroke-width="4"/>
+        <line x1="300" y1="148" x2="300" y2="212" stroke="#0f172a" stroke-width="8"/>
+        <line x1="300" y1="164" x2="350" y2="128" stroke="#0f172a" stroke-width="5"/><line x1="300" y1="196" x2="350" y2="232" stroke="#0f172a" stroke-width="5"/>
+        <path d="M338,218 L352,234 L330,232 Z" fill="#0f172a"/>
+        <line x1="350" y1="232" x2="350" y2="285" stroke="#0f172a" stroke-width="4"/>
+        <path d="M330,285 H370 M338,295 H362 M346,305 H354" stroke="#0f172a" stroke-width="4"/>
+        <line x1="120" y1="180" x2="150" y2="180" stroke="#0f172a" stroke-width="4"/><rect x="150" y="168" width="64" height="24" rx="3" fill="#fff" stroke="#0f172a" stroke-width="4"/><line x1="214" y1="180" x2="300" y2="180" stroke="#0f172a" stroke-width="4"/>
+        <text x="182" y="160" text-anchor="middle" font-size="15" font-weight="700" fill="#64748b">1 kΩ</text>
+        <rect x="14" y="160" width="106" height="42" rx="10" fill="#d5f5ef" stroke="#0d9488" stroke-width="3"/><text x="67" y="187" text-anchor="middle" font-size="16" font-weight="800" fill="#115e59">Pin D9</text>
+        <g class="onoff"><g fill="#f97316"><circle class="bdot" cx="226" cy="180" r="6"/><circle class="bdot" style="animation-delay:.5s" cx="226" cy="180" r="6"/></g></g>
+        <text x="300" y="262" font-size="15" font-weight="700" fill="#64748b" text-anchor="end">B (Basis)</text>
+        <text x="388" y="136" font-size="15" font-weight="700" fill="#64748b">C</text><text x="388" y="248" font-size="15" font-weight="700" fill="#64748b">E</text>
+        <g class="offl"><rect x="18" y="260" width="150" height="46" rx="23" fill="#e2e8f0"/><text x="93" y="291" text-anchor="middle" font-size="20" font-weight="800" fill="#64748b">SAKLAR OFF</text></g>
+        <g class="onl"><rect x="18" y="260" width="150" height="46" rx="23" fill="#16a34a"/><text x="93" y="291" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">SAKLAR ON</text></g>
+      </svg>
+    </div>
+    <div class="col" style="display:grid;gap:14px">
+      <div class="card a r" style="--d:3"><h3>Cara kerja</h3><p>Arus kecil di <b>Basis</b> membuka jalur <b>Kolektor → Emitor</b> sehingga arus besar (motor, lampu) bisa mengalir.</p></div>
+      <div class="card a r" style="--d:4"><h3>Jenis populer</h3><span class="tag">BJT NPN</span><span class="tag">2N2222</span><span class="tag">BC547</span><span class="tag o">MOSFET</span><span class="tag o">IRLZ44N</span><span class="tag o">IRF520</span></div>
+      <div class="note a r" style="--d:5"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-alert"/></svg>Penting:</b> pin Arduino hanya kuat ±20 mA. Jangan hubungkan motor langsung ke pin — gunakan transistor/driver &amp; dioda flyback.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 11. KOMPONEN LAIN -->
+<section class="slide">
+  <div class="head"><span class="kick a">Komponen Pendukung</span><h2 class="a" style="--d:1">Komponen lain yang <em>sering dipakai</em></h2></div>
+  <div class="g g3">
+    <div class="card a" style="--d:2"><span class="ico bob"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-grid"/></svg></span><h3>Breadboard</h3><p>Papan percobaan tanpa solder. Lajur tengah terhubung vertikal, rel samping untuk +/−.</p></div>
+    <div class="card a" style="--d:3"><span class="ico bob" style="animation-delay:.3s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-dot"/></svg></span><h3>Push Button</h3><p>Saklar sesaat. Tersambung saat ditekan; biasanya dipasang dengan pull-up.</p></div>
+    <div class="card a" style="--d:4"><span class="ico bob" style="animation-delay:.6s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gauge"/></svg></span><h3>Potensiometer</h3><p>Resistor variabel (10 kΩ). Memutar knob = nilai analog 0–1023 untuk kecepatan, volume, dll.</p></div>
+    <div class="card a" style="--d:5"><span class="ico bob" style="animation-delay:.9s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-toggle"/></svg></span><h3>Relay</h3><p>Saklar elektromagnetik untuk beban AC/DC besar (lampu, pompa) — terisolasi dari mikrokontroler.</p></div>
+    <div class="card a" style="--d:6"><span class="ico bob" style="animation-delay:1.2s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-volume"/></svg></span><h3>Buzzer</h3><p>Penghasil bunyi. Aktif (nada tetap) atau pasif (nada diatur lewat frekuensi/tone()).</p></div>
+    <div class="card a" style="--d:7"><span class="ico bob" style="animation-delay:1.5s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-zap"/></svg></span><h3>Regulator Tegangan</h3><p>7805 / LM2596 menurunkan tegangan baterai (mis. 12 V) menjadi 5 V atau 3,3 V yang stabil.</p></div>
+  </div>
+</section>
+
+<!-- 12. MIKROKONTROLER -->
+<section class="slide">
+  <div class="head"><span class="kick a">Otak Robot</span><h2 class="a" style="--d:1"><em>Mikrokontroler</em> — komputer mini dalam satu chip</h2></div>
+  <div class="row">
+    <div class="a z" style="--d:2;width:440px">
+      <svg id="chip" viewBox="62 62 296 296" width="430" height="430">
+        <rect x="110" y="110" width="200" height="200" rx="18" fill="#1e293b"/>
+        <g class="a z" style="--d:3"><rect x="126" y="126" width="76" height="68" rx="10" fill="#2563eb"/><text x="164" y="166" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">CPU</text></g>
+        <g class="a z" style="--d:4"><rect x="212" y="126" width="82" height="68" rx="10" fill="#0d9488"/><text x="253" y="166" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">RAM</text></g>
+        <g class="a z" style="--d:5"><rect x="126" y="204" width="76" height="90" rx="10" fill="#7c3aed"/><text x="164" y="254" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">Flash</text></g>
+        <g class="a z" style="--d:6"><rect x="212" y="204" width="82" height="90" rx="10" fill="#f97316"/><text x="253" y="254" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">I/O</text></g>
+        <g id="pins"></g>
+      </svg>
+    </div>
+    <div class="col" style="display:grid;gap:14px">
+      <div class="card a r" style="--d:3"><h3>Satu chip, lengkap</h3><p><b>CPU</b> menjalankan instruksi, <b>RAM</b> menyimpan data sementara, <b>Flash</b> menyimpan program, dan <b>pin I/O</b> terhubung ke dunia luar.</p></div>
+      <div class="card a r" style="--d:4"><h3>Fitur pin yang penting</h3><span class="tag">GPIO digital</span><span class="tag t">ADC (analog)</span><span class="tag o">PWM</span><span class="tag p">UART</span><span class="tag p">I2C</span><span class="tag p">SPI</span><span class="tag k">Timer</span></div>
+      <div class="card a r" style="--d:5"><h3>Beda dengan komputer biasa</h3><ul><li>Hemat daya &amp; murah</li><li>Tanpa sistem operasi — langsung menjalankan program</li><li>Dirancang untuk satu tugas: mengendalikan hardware</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- 13. ARDUINO UNO -->
+<section class="slide">
+  <div class="head"><span class="kick a">Papan Pengembangan</span><h2 class="a" style="--d:1"><em>Arduino Uno</em> — pintu masuk dunia embedded</h2></div>
+  <div class="row">
+    <div style="width:640px" class="a l"><svg viewBox="0 0 640 430" width="640">
+      <rect class="a z" style="--d:2" x="70" y="70" width="500" height="300" rx="20" fill="#00979d" stroke="#007a80" stroke-width="4"/>
+      <g class="a z" style="--d:2">
+        <rect x="30" y="110" width="100" height="74" rx="4" fill="#cbd5e1" stroke="#64748b" stroke-width="3"/><rect x="42" y="124" width="76" height="46" fill="#e2e8f0"/>
+        <rect x="30" y="256" width="90" height="84" rx="4" fill="#1f2937"/><circle cx="76" cy="298" r="16" fill="#0f172a" stroke="#475569" stroke-width="3"/>
+        <circle cx="170" cy="112" r="16" fill="#dc2626" stroke="#fff" stroke-width="4"/>
+        <rect x="250" y="76" width="300" height="20" rx="3" fill="#111827"/><line x1="258" y1="86" x2="548" y2="86" stroke="#fbbf24" stroke-width="8" stroke-dasharray="7 13"/>
+        <rect x="222" y="344" width="164" height="20" rx="3" fill="#111827"/><line x1="230" y1="354" x2="384" y2="354" stroke="#fbbf24" stroke-width="8" stroke-dasharray="7 13"/>
+        <rect x="412" y="344" width="130" height="20" rx="3" fill="#111827"/><line x1="420" y1="354" x2="540" y2="354" stroke="#fbbf24" stroke-width="8" stroke-dasharray="7 13"/>
+        <rect x="330" y="190" width="190" height="56" rx="4" fill="#111827"/><text x="425" y="224" text-anchor="middle" font-size="16" font-weight="700" fill="#fff" font-family="JetBrains Mono, monospace">ATMEGA328P</text>
+        <rect x="250" y="205" width="36" height="18" rx="9" fill="#e2e8f0"/>
+        <rect class="ledb" x="420" y="128" width="16" height="9" fill="#fb923c"/><text x="428" y="152" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">L</text>
+        <text x="130" y="310" font-size="34" font-weight="800" fill="#fff" opacity=".95">ARDUINO</text><text x="130" y="340" font-size="26" font-weight="700" fill="#fff" opacity=".8">UNO</text>
+      </g>
+      <g font-size="16" font-weight="800" fill="#fff" text-anchor="middle">
+        <g class="a z" style="--d:3"><circle class="ring" cx="80" cy="147" r="15" fill="#f97316"/><circle cx="80" cy="147" r="15" fill="#f97316" stroke="#fff" stroke-width="3"/><text x="80" y="153">1</text></g>
+        <g class="a z" style="--d:4"><circle class="ring" cx="75" cy="298" r="15" fill="#f97316"/><circle cx="75" cy="298" r="15" fill="#f97316" stroke="#fff" stroke-width="3"/><text x="75" y="304">2</text></g>
+        <g class="a z" style="--d:5"><circle class="ring" cx="425" cy="268" r="15" fill="#f97316"/><circle cx="425" cy="268" r="15" fill="#f97316" stroke="#fff" stroke-width="3"/><text x="425" y="274">3</text></g>
+        <g class="a z" style="--d:6"><circle class="ring" cx="400" cy="50" r="15" fill="#f97316"/><circle cx="400" cy="50" r="15" fill="#f97316" stroke="#fff" stroke-width="3"/><text x="400" y="56">4</text></g>
+        <g class="a z" style="--d:7"><circle class="ring" cx="477" cy="394" r="15" fill="#f97316"/><circle cx="477" cy="394" r="15" fill="#f97316" stroke="#fff" stroke-width="3"/><text x="477" y="400">5</text></g>
+        <g class="a z" style="--d:8"><circle class="ring" cx="304" cy="394" r="15" fill="#f97316"/><circle cx="304" cy="394" r="15" fill="#f97316" stroke="#fff" stroke-width="3"/><text x="304" y="400">6</text></g>
+        <g class="a z" style="--d:9"><circle class="ring" cx="170" cy="52" r="15" fill="#f97316"/><circle cx="170" cy="52" r="15" fill="#f97316" stroke="#fff" stroke-width="3"/><text x="170" y="58">7</text></g>
+      </g>
+    </svg></div>
+    <div class="col">
+      <div class="card a r" style="--d:3;padding:14px 18px">
+        <div class="rule" style="margin-bottom:7px"><span class="tag o" style="margin:0">1</span><p><b>Port USB</b> — upload program &amp; daya 5 V</p></div>
+        <div class="rule" style="margin-bottom:7px"><span class="tag o" style="margin:0">2</span><p><b>Jack DC</b> — daya eksternal 7–12 V</p></div>
+        <div class="rule" style="margin-bottom:7px"><span class="tag o" style="margin:0">3</span><p><b>ATmega328P</b> — otak Arduino</p></div>
+        <div class="rule" style="margin-bottom:7px"><span class="tag o" style="margin:0">4</span><p><b>Pin digital 0–13</b> — 6 pin bertanda ~ bisa PWM</p></div>
+        <div class="rule" style="margin-bottom:7px"><span class="tag o" style="margin:0">5</span><p><b>Pin analog A0–A5</b> — baca sensor analog</p></div>
+        <div class="rule" style="margin-bottom:7px"><span class="tag o" style="margin:0">6</span><p><b>Pin daya</b> — 5V, 3.3V, GND, VIN</p></div>
+        <div class="rule"><span class="tag o" style="margin:0">7</span><p><b>Tombol Reset</b> — mulai ulang program</p></div>
+      </div>
+      <div class="a r" style="--d:6;margin-top:14px"><span class="tag t">5 V logic</span><span class="tag t">16 MHz</span><span class="tag t">32 KB Flash</span><span class="tag t">2 KB SRAM</span><span class="tag t">14 digital I/O</span><span class="tag t">ADC 10-bit</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 14. KODE ARDUINO -->
+<section class="slide">
+  <div class="head"><span class="kick a">Pemrograman</span><h2 class="a" style="--d:1">Program pertama: <em>Blink LED</em></h2></div>
+  <div class="row">
+    <div class="code a l" style="--d:2;width:680px">
+<div class="ln a" style="--d:3"><div class="hlb"><span class="c">// LED bawaan di pin 13</span></div></div>
+<div class="ln a" style="--d:3"><div class="hlb"><span class="k">const int</span> LED = <span class="nm">13</span>;</div></div>
+<div class="ln a" style="--d:3"><div class="hlb"> </div></div>
+<div class="ln a" style="--d:4"><div class="hlb"><span class="k">void</span> <span class="f">setup</span>() {</div></div>
+<div class="ln a" style="--d:4"><div class="hlb">  <span class="f">pinMode</span>(LED, OUTPUT); <span class="c">// jadikan output</span></div></div>
+<div class="ln a" style="--d:4"><div class="hlb">}</div></div>
+<div class="ln a" style="--d:5"><div class="hlb"> </div></div>
+<div class="ln a" style="--d:5"><div class="hlb"><span class="k">void</span> <span class="f">loop</span>() {</div></div>
+<div class="ln a" style="--d:6"><div class="hlb h0">  <span class="f">digitalWrite</span>(LED, HIGH); <span class="c">// nyalakan</span></div></div>
+<div class="ln a" style="--d:6"><div class="hlb h1">  <span class="f">delay</span>(<span class="nm">1000</span>);          <span class="c">// tunggu 1 detik</span></div></div>
+<div class="ln a" style="--d:7"><div class="hlb h2">  <span class="f">digitalWrite</span>(LED, LOW);  <span class="c">// matikan</span></div></div>
+<div class="ln a" style="--d:7"><div class="hlb h3">  <span class="f">delay</span>(<span class="nm">1000</span>);</div></div>
+<div class="ln a" style="--d:7"><div class="hlb">}</div></div>
+    </div>
+    <div class="col" style="display:grid;gap:14px">
+      <div class="card a r" style="--d:4;text-align:center;padding:10px">
+        <svg viewBox="0 0 300 170" width="260">
+          <circle class="bulb" cx="150" cy="70" r="46" fill="#e2e8f0" stroke="#0f172a" stroke-width="5"/>
+          <path d="M126,100 H174 V124 H126 Z" fill="#94a3b8"/><rect x="134" y="124" width="32" height="12" rx="4" fill="#64748b"/>
+          <g font-size="20" font-weight="800" font-family="JetBrains Mono, monospace" text-anchor="middle"><text class="lblH" x="150" y="164" fill="#ca8a04">HIGH · 5 V</text><text class="lblL" x="150" y="164" fill="#64748b">LOW · 0 V</text></g>
+        </svg>
+      </div>
+      <div class="card a r" style="--d:5"><h3><span class="mono" style="color:var(--blue)">setup()</span></h3><p>Dijalankan <b>sekali</b> saat Arduino menyala — untuk pengaturan awal.</p></div>
+      <div class="card a r" style="--d:6"><h3><span class="mono" style="color:var(--blue)">loop()</span></h3><p>Diulang <b>selamanya</b>. Baris yang menyala di kode = baris yang sedang dieksekusi.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 15. ESP32 -->
+<section class="slide">
+  <div class="head"><span class="kick a">Papan Pengembangan</span><h2 class="a" style="--d:1"><em>ESP32</em> — kecil, kencang, terhubung</h2></div>
+  <div class="row">
+    <div class="a l" style="--d:2;width:350px"><svg viewBox="0 0 360 470" width="350">
+      <g fill="none" stroke="#2563eb" stroke-width="7" stroke-linecap="round">
+        <path class="beam" d="M158.8,88.8 A30 30 0 0 1 201.2,88.8"/><path class="beam" style="animation-delay:.25s" d="M141.1,71.1 A55 55 0 0 1 218.9,71.1"/><path class="beam" style="animation-delay:.5s" d="M123.4,53.4 A80 80 0 0 1 236.6,53.4"/></g>
+      <circle class="pulse" cx="180" cy="110" r="6" fill="#2563eb"/>
+      <text x="180" y="22" text-anchor="middle" font-size="15" font-weight="800" fill="#2563eb">WiFi 2.4 GHz</text>
+      <g class="float" style="animation-delay:.5s"><circle cx="295" cy="86" r="26" fill="#2563eb"/><text x="295" y="95" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">B</text></g>
+      <text x="295" y="130" text-anchor="middle" font-size="13" font-weight="700" fill="#2563eb">Bluetooth</text>
+      <g class="a z" style="--d:3">
+        <rect x="100" y="140" width="160" height="300" rx="12" fill="#1e293b"/>
+        <rect x="114" y="152" width="132" height="150" rx="4" fill="#cbd5e1"/><rect x="114" y="152" width="132" height="44" fill="#94a3b8"/>
+        <polyline points="126,186 126,166 140,166 140,186 154,186 154,166 168,166 168,186 182,186 182,166 196,166 196,186 210,186 210,166 224,166 224,186 236,186" fill="none" stroke="#b45309" stroke-width="3"/>
+        <text x="180" y="244" text-anchor="middle" font-size="22" font-weight="800" fill="#0f172a">ESP32</text><text x="180" y="268" text-anchor="middle" font-size="13" font-weight="700" fill="#475569">WROOM-32</text>
+        <line x1="108" y1="318" x2="108" y2="426" stroke="#fbbf24" stroke-width="6" stroke-dasharray="6 8"/><line x1="252" y1="318" x2="252" y2="426" stroke="#fbbf24" stroke-width="6" stroke-dasharray="6 8"/>
+        <circle class="ledb2" cx="180" cy="322" r="6" fill="#38bdf8"/>
+        <rect x="150" y="430" width="60" height="26" rx="3" fill="#94a3b8"/>
+        <circle cx="128" cy="414" r="8" fill="#f1f5f9"/><circle cx="232" cy="414" r="8" fill="#f1f5f9"/>
+      </g>
+    </svg></div>
+    <div class="col">
+      <div class="g g2" style="gap:14px">
+        <div class="card a" style="--d:3"><h3 style="color:var(--blue)">Dual-core</h3><p>Xtensa 32-bit hingga <b>240 MHz</b></p></div>
+        <div class="card a" style="--d:4"><h3 style="color:var(--teal)">WiFi + BLE</h3><p>Bawaan chip: WiFi b/g/n &amp; Bluetooth 4.2</p></div>
+        <div class="card a" style="--d:5"><h3 style="color:var(--purple)">Memori</h3><p><b>520 KB</b> SRAM, 4 MB Flash (umum)</p></div>
+        <div class="card a" style="--d:6"><h3 style="color:var(--orange)">±34 GPIO</h3><p>ADC <b>12-bit</b>, DAC, PWM, touch sensor</p></div>
+      </div>
+      <div class="card a" style="--d:7;margin-top:14px"><h3>Cocok untuk</h3><span class="tag">Dashboard IoT</span><span class="tag t">Web server mini</span><span class="tag o">Kontrol via HP</span><span class="tag p">ESP-NOW</span><span class="tag k">Deep sleep (hemat baterai)</span></div>
+      <div class="note a" style="--d:8;margin-top:14px"><b><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-alert"/></svg>Logika 3,3 V.</b> Pin ESP32 tidak tahan 5 V — gunakan pembagi tegangan atau level shifter untuk sensor 5 V.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 16. PERBANDINGAN -->
+<section class="slide">
+  <div class="head"><span class="kick a">Perbandingan</span><h2 class="a" style="--d:1"><em>Arduino Uno</em> vs <em>ESP32</em></h2></div>
+  <div class="tbl">
+    <div class="tr th a" style="--d:2"><div></div><div>Arduino Uno</div><div>ESP32</div></div>
+    <div class="tr a l" style="--d:3"><div>Prosesor</div><div>ATmega328P · 8-bit</div><div>Xtensa LX6 · 32-bit dual-core</div></div>
+    <div class="tr a l" style="--d:4"><div>Kecepatan</div><div>16 MHz</div><div>hingga 240 MHz</div></div>
+    <div class="tr a l" style="--d:5"><div>Tegangan logika</div><div>5 V</div><div>3,3 V (bukan 5V-tolerant)</div></div>
+    <div class="tr a l" style="--d:6"><div>Memori</div><div>32 KB Flash · 2 KB SRAM</div><div>4 MB Flash · 520 KB SRAM</div></div>
+    <div class="tr a l" style="--d:7"><div>WiFi / Bluetooth</div><div>Tidak ada (butuh modul)</div><div><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--green)"><use href="#i-check"/></svg>Bawaan</div></div>
+    <div class="tr a l" style="--d:8"><div>ADC</div><div>10-bit (0–1023)</div><div>12-bit (0–4095)</div></div>
+    <div class="tr a l" style="--d:9"><div>Kemudahan belajar</div><div><span class="rate"><i class="on"></i><i class="on"></i><i class="on"></i></span>Sangat mudah</div><div><span class="rate"><i class="on"></i><i class="on"></i><i></i></span>Mudah–menengah</div></div>
+    <div class="tr a l" style="--d:10"><div>Cocok untuk</div><div>Belajar dasar, robot sederhana</div><div>IoT, robot terhubung, proyek kompleks</div></div>
+  </div>
+  <p class="sub a" style="--d:11;font-size:16px;margin-top:8px">Keduanya bisa diprogram dengan <b>Arduino IDE</b> dan bahasa C/C++ yang sama.</p>
+</section>
+
+<!-- 17. JENIS SENSOR -->
+<section class="slide">
+  <div class="head"><span class="kick a">Sensor</span><h2 class="a" style="--d:1">Sensor = <em>indera</em> robot</h2></div>
+  <div class="flowrow a" style="--d:2;margin-bottom:20px">
+    <div class="pill"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-thermo"/></svg>Besaran fisik<small>suhu, cahaya, jarak…</small></div><div class="conn"></div>
+    <div class="pill hl"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-scan"/></svg>Sensor<small>transduser</small></div><div class="conn"></div>
+    <div class="pill"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-zap"/></svg>Sinyal listrik<small>tegangan / digital</small></div><div class="conn"></div>
+    <div class="pill"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-cpu"/></svg>Mikrokontroler<small>baca &amp; olah</small></div>
+  </div>
+  <div class="g g4" style="gap:16px">
+    <div class="card a" style="--d:3"><span class="ico bob"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-distance"/></svg></span><h3>Jarak</h3><p class="mono" style="font-size:13.5px">HC-SR04 · Sharp IR · VL53L0X (ToF)</p></div>
+    <div class="card a" style="--d:4"><span class="ico bob" style="animation-delay:.3s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sun"/></svg></span><h3>Cahaya</h3><p class="mono" style="font-size:13.5px">LDR · Photodioda · BH1750</p></div>
+    <div class="card a" style="--d:5"><span class="ico bob" style="animation-delay:.6s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-thermo"/></svg></span><h3>Suhu &amp; Lembap</h3><p class="mono" style="font-size:13.5px">DHT11/22 · LM35 · DS18B20</p></div>
+    <div class="card a" style="--d:6"><span class="ico bob" style="animation-delay:.9s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-activity"/></svg></span><h3>Gerak</h3><p class="mono" style="font-size:13.5px">PIR HC-SR501 · Mikrowave RCWL</p></div>
+    <div class="card a" style="--d:7"><span class="ico bob" style="animation-delay:1.2s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-route"/></svg></span><h3>Garis &amp; Warna</h3><p class="mono" style="font-size:13.5px">TCRT5000 · IR line · TCS3200</p></div>
+    <div class="card a" style="--d:8"><span class="ico bob" style="animation-delay:1.5s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mic"/></svg></span><h3>Suara</h3><p class="mono" style="font-size:13.5px">KY-038 · MAX9814</p></div>
+    <div class="card a" style="--d:9"><span class="ico bob" style="animation-delay:1.8s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wind"/></svg></span><h3>Gas &amp; Asap</h3><p class="mono" style="font-size:13.5px">MQ-2 · MQ-135 · MQ-7</p></div>
+    <div class="card a" style="--d:10"><span class="ico bob" style="animation-delay:2.1s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-compass"/></svg></span><h3>Orientasi</h3><p class="mono" style="font-size:13.5px">MPU6050 · HMC5883L · GPS</p></div>
+  </div>
+</section>
+
+<!-- 18. ANALOG VS DIGITAL -->
+<section class="slide">
+  <div class="head"><span class="kick a">Sensor</span><h2 class="a" style="--d:1">Sinyal <em>analog</em> vs <em>digital</em></h2></div>
+  <div class="g g2" style="gap:22px">
+    <div class="card a l" style="--d:2">
+      <h3 style="color:var(--blue);font-size:24px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sine"/></svg>Analog</h3>
+      <svg viewBox="0 0 480 130" width="100%"><line x1="0" y1="65" x2="480" y2="65" stroke="#e2e8f0" stroke-width="2"/>
+        <path class="draw" pathLength="1000" d="M0,65 C40,5 80,5 120,65 S200,125 240,65 S320,5 360,65 S440,125 480,65" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/></svg>
+      <p>Nilai <b>kontinu</b> — bisa berapa saja dalam rentang tertentu.</p>
+      <p class="mono" style="color:var(--blue);margin:8px 0;font-size:15px">analogRead(A0) → 0–1023 (Uno)<br>analogRead(34) → 0–4095 (ESP32)</p>
+      <span class="tag">LDR</span><span class="tag">LM35</span><span class="tag">Potensiometer</span><span class="tag">MQ-2</span>
+    </div>
+    <div class="card a r" style="--d:2">
+      <h3 style="color:var(--orange);font-size:24px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-square"/></svg>Digital</h3>
+      <svg viewBox="0 0 480 130" width="100%"><line x1="0" y1="110" x2="480" y2="110" stroke="#e2e8f0" stroke-width="2"/>
+        <path class="draw" pathLength="1000" d="M0,110 H60 V20 H180 V110 H260 V20 H340 V110 H420 V20 H480" fill="none" stroke="#f97316" stroke-width="6" stroke-linejoin="round"/></svg>
+      <p>Hanya dua keadaan — <b>HIGH (1)</b> atau <b>LOW (0)</b>.</p>
+      <p class="mono" style="color:#c2410c;margin:8px 0;font-size:15px">digitalRead(2) → HIGH / LOW<br>Protokol: I2C, SPI, 1-Wire</p>
+      <span class="tag o">PIR</span><span class="tag o">Push button</span><span class="tag o">DHT22</span><span class="tag o">MPU6050</span>
+    </div>
+  </div>
+  <div class="note b a" style="--d:5;margin-top:20px"><b>ADC</b> (Analog-to-Digital Converter) di dalam mikrokontroler mengubah tegangan sensor analog menjadi angka agar bisa diolah program.</div>
+</section>
+
+<!-- 19. ULTRASONIK -->
+<section class="slide">
+  <div class="head"><span class="kick a">Sensor · Jarak</span><h2 class="a" style="--d:1"><em>HC-SR04</em> — sensor ultrasonik</h2></div>
+  <div class="row">
+    <div style="width:640px">
+      <div class="card a l" style="--d:2;padding:6px 10px">
+        <svg viewBox="0 0 700 280" width="100%">
+          <rect x="20" y="85" width="150" height="100" rx="8" fill="#0ea5e9"/>
+          <circle cx="62" cy="135" r="32" fill="#e2e8f0" stroke="#475569" stroke-width="4"/><circle cx="62" cy="135" r="18" fill="#334155"/>
+          <circle cx="128" cy="135" r="32" fill="#e2e8f0" stroke="#475569" stroke-width="4"/><circle cx="128" cy="135" r="18" fill="#334155"/>
+          <text x="95" y="212" text-anchor="middle" font-size="14" font-weight="700" fill="#0369a1" font-family="JetBrains Mono, monospace">TRIG · ECHO</text>
+          <g transform="translate(180,135)"><path class="wv" d="M0,-34 A34 34 0 0 1 0,34" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/></g>
+          <g transform="translate(180,135)"><path class="wv" style="animation-delay:.3s" d="M0,-34 A34 34 0 0 1 0,34" fill="none" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/></g>
+          <g transform="translate(180,135)"><path class="ec" d="M0,-34 A34 34 0 0 0 0,34" fill="none" stroke="#f97316" stroke-width="6" stroke-linecap="round"/></g>
+          <rect x="590" y="60" width="70" height="150" rx="10" fill="#94a3b8"/><text x="625" y="140" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">OBJEK</text>
+          <text x="380" y="56" text-anchor="middle" font-size="16" font-weight="700" fill="#2563eb">→ gelombang 40 kHz dikirim</text>
+          <text x="380" y="248" text-anchor="middle" font-size="16" font-weight="700" fill="#f97316">← pantulan (echo) diterima</text>
+        </svg>
+      </div>
+      <div class="formula a z" style="--d:5;margin-top:14px;font-size:26px">cm = durasi(µs) × 0,034 ÷ 2</div>
+    </div>
+    <div class="col" style="display:grid;gap:12px">
+      <div class="card a r" style="--d:3;padding:14px 18px"><h3>Pin &amp; spesifikasi</h3><span class="tag t">VCC 5 V</span><span class="tag">TRIG</span><span class="tag o">ECHO</span><span class="tag t">GND</span><p style="margin-top:8px">Jangkauan <b>2–400 cm</b>, akurasi ±3 mm.</p></div>
+      <div class="code a r" style="--d:4;font-size:14.5px;line-height:1.55;padding:12px 4px"><div class="ln"><div class="hlb"><span class="f">digitalWrite</span>(TRIG, HIGH);</div></div><div class="ln"><div class="hlb"><span class="f">delayMicroseconds</span>(<span class="nm">10</span>);</div></div><div class="ln"><div class="hlb"><span class="f">digitalWrite</span>(TRIG, LOW);</div></div><div class="ln"><div class="hlb"><span class="k">long</span> t = <span class="f">pulseIn</span>(ECHO, HIGH);</div></div><div class="ln"><div class="hlb"><span class="k">float</span> cm = t * <span class="nm">0.034</span> / <span class="nm">2</span>;</div></div></div>
+      <div class="note a r" style="--d:6;font-size:15px"><b>ESP32:</b> pin ECHO mengeluarkan 5 V — pakai pembagi tegangan (mis. 1 kΩ + 2 kΩ).</div>
+    </div>
+  </div>
+</section>
+
+<!-- 20. SENSOR POPULER -->
+<section class="slide">
+  <div class="head"><span class="kick a">Sensor · Populer</span><h2 class="a" style="--d:1">Enam sensor yang <em>wajib kenal</em></h2></div>
+  <div class="g g3" style="gap:16px">
+    <div class="card mini a" style="--d:2"><svg viewBox="0 0 108 86"><g class="sunr"><g stroke="#f59e0b" stroke-width="4" stroke-linecap="round"><line x1="54" y1="6" x2="54" y2="16"/><line x1="54" y1="70" x2="54" y2="80"/><line x1="14" y1="43" x2="24" y2="43"/><line x1="84" y1="43" x2="94" y2="43"/><line x1="26" y1="15" x2="33" y2="22"/><line x1="75" y1="64" x2="82" y2="71"/><line x1="82" y1="15" x2="75" y2="22"/><line x1="33" y1="64" x2="26" y2="71"/></g></g><circle class="pulse" cx="54" cy="43" r="14" fill="#fde047" stroke="#f59e0b" stroke-width="3"/></svg><div><h3>LDR</h3><p>Hambatan turun saat terang. <span class="tag" style="margin:0">Analog</span></p></div></div>
+    <div class="card mini a" style="--d:3"><svg viewBox="0 0 108 86"><rect x="46" y="8" width="16" height="56" rx="8" fill="#fff" stroke="#475569" stroke-width="3"/><circle cx="54" cy="68" r="12" fill="#dc2626" stroke="#475569" stroke-width="3"/><rect class="merc" x="51" y="14" width="6" height="52" rx="3" fill="#dc2626"/></svg><div><h3>DHT22</h3><p>Suhu &amp; kelembapan. <span class="tag o" style="margin:0">Digital</span></p></div></div>
+    <div class="card mini a" style="--d:4"><svg viewBox="0 0 108 86"><path class="beam" d="M30,40 A24 24 0 0 1 78,40" fill="none" stroke="#7c3aed" stroke-width="3"/><path class="beam" style="animation-delay:.3s" d="M20,36 A34 34 0 0 1 88,36" fill="none" stroke="#7c3aed" stroke-width="3"/><circle cx="54" cy="46" r="14" fill="#fff" stroke="#475569" stroke-width="3"/><g class="walk"><circle cx="54" cy="58" r="5" fill="#f97316"/><rect x="48" y="64" width="12" height="16" rx="5" fill="#f97316"/></g></svg><div><h3>PIR</h3><p>Deteksi gerak inframerah. <span class="tag o" style="margin:0">Digital</span></p></div></div>
+    <div class="card mini a" style="--d:5"><svg viewBox="0 0 108 86"><rect x="36" y="6" width="36" height="16" rx="4" fill="#334155"/><path class="beam" d="M48,22 L60,22 L76,62 L32,62 Z" fill="#60a5fa" opacity=".7"/><rect x="14" y="62" width="80" height="14" fill="#f1f5f9" stroke="#cbd5e1"/><rect x="46" y="62" width="16" height="14" fill="#111827"/></svg><div><h3>IR Line</h3><p>Hitam menyerap, putih memantul. <span class="tag o" style="margin:0">Dig/Ana</span></p></div></div>
+    <div class="card mini a" style="--d:6"><svg viewBox="0 0 108 86"><g class="tilt"><rect x="28" y="20" width="52" height="46" rx="8" fill="#2563eb"/><circle cx="54" cy="43" r="8" fill="#fff"/><rect x="48" y="38" width="12" height="10" fill="#2563eb" opacity=".4"/></g></svg><div><h3>MPU6050</h3><p>Akselerometer + giroskop. <span class="tag p" style="margin:0">I2C</span></p></div></div>
+    <div class="card mini a" style="--d:7"><svg viewBox="0 0 108 86"><rect x="30" y="46" width="48" height="28" rx="6" fill="#64748b"/><g fill="#94a3b8"><circle class="bub" cx="42" cy="44" r="5"/><circle class="bub" style="animation-delay:.8s" cx="56" cy="44" r="7"/><circle class="bub" style="animation-delay:1.6s" cx="68" cy="44" r="5"/></g></svg><div><h3>MQ-2 / MQ-135</h3><p>Gas, asap, kualitas udara. <span class="tag" style="margin:0">Analog</span></p></div></div>
+  </div>
+</section>
+
+<!-- 21. AKTUATOR -->
+<section class="slide">
+  <div class="head"><span class="kick a">Aktuator</span><h2 class="a" style="--d:1">Aktuator = <em>otot</em> robot</h2></div>
+  <div class="g g3">
+    <div class="card a" style="--d:2;text-align:center"><svg viewBox="0 0 212 160" width="200"><rect x="26" y="52" width="104" height="56" rx="10" fill="#94a3b8"/><rect x="130" y="62" width="14" height="36" fill="#64748b"/><rect x="144" y="78" width="14" height="4" fill="#475569"/><g class="dcm" style="transform-origin:170px 80px;transform-box:view-box"><circle cx="170" cy="80" r="32" fill="#fff" stroke="#0f172a" stroke-width="4"/><path d="M170,52 V108 M142,80 H198 M150,60 L190,100 M190,60 L150,100" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/></g></svg><h3>Motor DC</h3><p>Berputar terus. Kecepatan diatur dengan <b>PWM</b>, arah lewat driver (H-bridge). Untuk roda.</p></div>
+    <div class="card a" style="--d:3;text-align:center"><svg viewBox="0 0 200 160" width="190"><rect x="14" y="56" width="112" height="78" rx="8" fill="#2563eb"/><rect x="4" y="70" width="14" height="50" rx="3" fill="#1d4ed8"/><path d="M52,96 A70 70 0 0 1 188,96" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4 5" transform="translate(0,-4)"/><g class="sweep" style="transform-origin:130px 95px;transform-box:view-box"><rect x="124" y="88" width="68" height="14" rx="7" fill="#f97316"/><circle cx="130" cy="95" r="12" fill="#fff" stroke="#0f172a" stroke-width="3"/></g></svg><h3>Servo</h3><p>Bergerak ke <b>sudut tertentu</b> (0–180°). Cocok untuk lengan, gripper, dan kemudi.</p></div>
+    <div class="card a" style="--d:4;text-align:center"><svg viewBox="0 0 200 160" width="190"><rect x="50" y="22" width="100" height="116" rx="12" fill="#7c3aed"/><circle cx="100" cy="80" r="36" fill="#fff"/><g class="stepr" style="transform-origin:100px 80px;transform-box:view-box"><circle cx="100" cy="80" r="30" fill="#ede9fe" stroke="#7c3aed" stroke-width="3"/><line x1="100" y1="80" x2="100" y2="54" stroke="#f97316" stroke-width="6" stroke-linecap="round"/><circle cx="100" cy="80" r="6" fill="#0f172a"/></g></svg><h3>Stepper</h3><p>Berputar <b>selangkah demi selangkah</b>. Posisi presisi: printer 3D, CNC, plotter.</p></div>
+  </div>
+  <div class="card a" style="--d:6;margin-top:18px;display:flex;gap:18px;align-items:center;justify-content:space-between"><h3 style="margin:0">Driver motor:</h3><div><span class="tag">L298N</span><span class="tag">L293D</span><span class="tag t">TB6612FNG</span><span class="tag o">DRV8833</span><span class="tag p">A4988 (stepper)</span></div><p style="max-width:300px">Pin Arduino tidak kuat menggerakkan motor — driver menyediakan arus besar.</p></div>
+</section>
+
+<!-- 22. KOMUNIKASI -->
+<section class="slide">
+  <div class="head"><span class="kick a">Komunikasi</span><h2 class="a" style="--d:1">Cara komponen <em>saling berbicara</em></h2></div>
+  <div class="g g2" style="gap:18px">
+    <div class="card a" style="--d:2"><h3>UART / Serial</h3><div class="link"><div class="nb">MCU</div><div class="wires"><div class="w" data-l="TX →"></div><div class="w r" data-l="← RX"></div></div><div class="nb">GPS<br>HC-05</div></div><p>2 kabel, dua arah, tanpa clock. Juga dipakai Serial Monitor.</p></div>
+    <div class="card a" style="--d:3"><h3>I2C</h3><div class="link"><div class="nb">MCU</div><div class="wires"><div class="w" data-l="SDA"></div><div class="w r" data-l="SCL"></div></div><div class="nb">OLED<br>MPU6050</div></div><p>2 kabel untuk <b>banyak perangkat</b> (tiap perangkat punya alamat unik).</p></div>
+    <div class="card a" style="--d:4"><h3>SPI</h3><div class="link"><div class="nb">MCU</div><div class="wires" style="gap:18px"><div class="w" data-l="MOSI"></div><div class="w r" data-l="MISO"></div><div class="w" data-l="SCK"></div><div class="w" data-l="CS"></div></div><div class="nb">SD Card<br>TFT</div></div><p>4 kabel, <b>sangat cepat</b>. Untuk kartu SD, layar, modul radio.</p></div>
+    <div class="card a" style="--d:5"><h3>WiFi &amp; Bluetooth</h3><div class="link"><div class="nb">ESP32</div><div class="wf"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wifi"/></svg></div><div class="nb">HP<br>Cloud</div></div><p><b>Nirkabel</b>: kirim data sensor ke internet atau kontrol robot dari ponsel.</p></div>
+  </div>
+</section>
+
+<!-- 23. DAYA & KESELAMATAN -->
+<section class="slide">
+  <div class="head"><span class="kick a">Praktik Baik</span><h2 class="a" style="--d:1">Daya &amp; <em>aturan keselamatan</em></h2></div>
+  <div class="row">
+    <div style="width:420px;display:grid;gap:14px">
+      <div class="card a l" style="--d:2"><h3><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--blue)"><use href="#i-battery"/></svg>Baterai AA / 9 V</h3><p>Mudah didapat, tapi cepat habis &amp; arus terbatas.</p></div>
+      <div class="card a l" style="--d:3"><h3><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--teal)"><use href="#i-battery"/></svg>Li-ion 18650 (3,7 V)</h3><p>Kuat &amp; bisa diisi ulang. Pakai modul proteksi (BMS) &amp; pengisi yang sesuai.</p></div>
+      <div class="card a l" style="--d:4"><h3><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--orange)"><use href="#i-battery"/></svg>LiPo</h3><p>Ringan &amp; berdaya besar untuk drone/robot cepat. Hati-hati: jangan ditusuk atau korsleting.</p></div>
+    </div>
+    <div class="col card a r" style="--d:3;display:grid;gap:12px;padding:20px 22px">
+      <div class="rule"><span class="b"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-link"/></svg></span><div><h3>Satukan GND</h3><p>Semua modul harus berbagi ground yang sama.</p></div></div>
+      <div class="rule"><span class="b"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-polar"/></svg></span><div><h3>Cek polaritas</h3><p>+ dan − terbalik bisa merusak chip dan kapasitor elektrolit.</p></div></div>
+      <div class="rule"><span class="b"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-zap"/></svg></span><div><h3>Batas arus pin</h3><p>Uno ±20 mA per pin. Motor &amp; servo besar → catu daya terpisah + driver.</p></div></div>
+      <div class="rule"><span class="b"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plug"/></svg></span><div><h3>Waspada 5 V vs 3,3 V</h3><p>Jangan beri 5 V ke pin ESP32 tanpa level shifter.</p></div></div>
+      <div class="rule"><span class="b"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clipcheck"/></svg></span><div><h3>Periksa sebelum menyalakan</h3><p>Pastikan tidak ada kabel korsleting; matikan daya saat membongkar.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 24. ROADMAP -->
+<section class="slide">
+  <div class="head"><span class="kick a">Langkah Berikutnya</span><h2 class="a" style="--d:1">Roadmap <em>robot pertamamu</em></h2></div>
+  <div class="tl">
+    <div class="track"></div><div class="fill"></div>
+    <div class="st a z" style="--d:2"><div class="dot">1</div><h3>Kenali komponen</h3><p>Resistor, LED, breadboard, Hukum Ohm</p></div>
+    <div class="st a z" style="--d:3"><div class="dot">2</div><h3>Blink LED</h3><p>Program pertama di Arduino</p></div>
+    <div class="st a z" style="--d:4"><div class="dot">3</div><h3>Baca sensor</h3><p>Tampilkan di Serial Monitor</p></div>
+    <div class="st a z" style="--d:5"><div class="dot">4</div><h3>Gerakkan motor</h3><p>Driver L298N &amp; servo</p></div>
+    <div class="st a z" style="--d:6"><div class="dot">5</div><h3>Gabungkan</h3><p>Sensor + logika + motor = robot</p></div>
+    <div class="st a z" style="--d:7"><div class="dot">6</div><h3>Tambah IoT</h3><p>ESP32 + WiFi / Bluetooth</p></div>
+  </div>
+  <h3 class="a" style="--d:8;margin-bottom:12px;font-size:22px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--amber)"><use href="#i-bulb"/></svg>Ide proyek untuk pemula</h3>
+  <div class="g g4" style="gap:14px">
+    <div class="card a" style="--d:9"><span class="ico sm bob"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-car"/></svg></span><h3 style="font-size:18px">Obstacle Avoider</h3><p style="font-size:14.5px">Ultrasonik + 2 motor</p></div>
+    <div class="card a" style="--d:10"><span class="ico sm bob" style="animation-delay:.3s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-route"/></svg></span><h3 style="font-size:18px">Line Follower</h3><p style="font-size:14.5px">Sensor IR + driver motor</p></div>
+    <div class="card a" style="--d:11"><span class="ico sm bob" style="animation-delay:.6s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bluetooth"/></svg></span><h3 style="font-size:18px">Robot Bluetooth</h3><p style="font-size:14.5px">Kontrol dari HP</p></div>
+    <div class="card a" style="--d:12"><span class="ico sm bob" style="animation-delay:.9s"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sprout"/></svg></span><h3 style="font-size:18px">Monitor Tanaman</h3><p style="font-size:14.5px">ESP32 + sensor kelembapan</p></div>
+  </div>
+</section>
+
+<!-- 25. PENUTUP -->
+<section class="slide cover">
+  <div class="cov-l">
+    <span class="kick a">Ringkasan</span>
+    <h1 class="a" style="--d:1;font-size:62px">Terima <span class="grad">kasih!</span></h1>
+    <div class="g" style="gap:10px;margin-top:20px">
+      <div class="card a l" style="--d:2;padding:12px 18px"><p><b>Robot</b> = sense → think → act</p></div>
+      <div class="card a l" style="--d:3;padding:12px 18px"><p><b>Komponen dasar</b>: resistor, kapasitor, dioda, transistor</p></div>
+      <div class="card a l" style="--d:4;padding:12px 18px"><p><b>Arduino</b> untuk belajar · <b>ESP32</b> untuk IoT</p></div>
+      <div class="card a l" style="--d:5;padding:12px 18px"><p><b>Sensor</b> = indera · <b>Aktuator</b> = otot</p></div>
+    </div>
+    <p class="hint a" style="--d:7">Navigasi: <kbd>←</kbd> <kbd>→</kbd> pindah slide · <kbd>Home</kbd>/<kbd>End</kbd> · <kbd>F</kbd> layar penuh</p>
+  </div>
+  <div class="cov-r a z" style="--d:3"><svg data-robot viewBox="0 0 420 480"></svg></div>
+</section>
+
+</div><!-- /stage -->
+
+<div id="ctrl">
+  <button id="prev" aria-label="Sebelumnya">‹</button>
+  <span id="count">1 / 25</span>
+  <button id="next" aria-label="Berikutnya">›</button>
+  <button id="fs" aria-label="Layar penuh" title="Layar penuh (F)"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-maximize"/></svg></button>
+</div>
+
+<script type="text/x-template" id="robot-tpl">
+  <ellipse cx="210" cy="466" rx="90" ry="11" fill="#0f172a" opacity=".12"/>
+  <g class="float">
+    <line x1="210" y1="62" x2="210" y2="104" stroke="#1e3a8a" stroke-width="6" stroke-linecap="round"/>
+    <circle class="pulse" cx="210" cy="50" r="13" fill="#f97316"/>
+    <rect x="92" y="152" width="20" height="52" rx="9" fill="#f97316"/><rect x="308" y="152" width="20" height="52" rx="9" fill="#f97316"/>
+    <rect x="92" y="290" width="32" height="104" rx="16" fill="#93c5fd"/>
+    <g class="wave"><rect x="296" y="290" width="32" height="104" rx="16" fill="#93c5fd"/><circle cx="312" cy="396" r="18" fill="#f97316"/></g>
+    <rect x="110" y="100" width="200" height="156" rx="42" fill="#fff" stroke="#2563eb" stroke-width="7"/>
+    <rect x="134" y="128" width="152" height="96" rx="26" fill="#dbeafe"/>
+    <g class="blink"><circle cx="178" cy="170" r="15" fill="#2563eb"/><circle cx="242" cy="170" r="15" fill="#2563eb"/></g>
+    <path d="M188 200 Q210 218 232 200" stroke="#2563eb" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <rect x="190" y="256" width="40" height="18" fill="#1e40af"/>
+    <rect x="124" y="270" width="172" height="146" rx="38" fill="#2563eb"/>
+    <rect x="160" y="300" width="100" height="72" rx="18" fill="#1d4ed8"/>
+    <circle cx="210" cy="336" r="26" fill="#fff"/><circle class="pulse" cx="210" cy="336" r="13" fill="#f97316"/>
+    <rect x="148" y="414" width="38" height="40" rx="12" fill="#1e3a8a"/><rect x="234" y="414" width="38" height="40" rx="12" fill="#1e3a8a"/>
+  </g>
+  <g class="float" style="animation-delay:.6s"><rect x="6" y="120" width="68" height="34" rx="17" fill="#fff" stroke="#e2e8f0"/><text x="40" y="143" text-anchor="middle" font-size="15" font-weight="700" fill="#0d9488" font-family="JetBrains Mono, monospace">LED</text></g>
+  <g class="float" style="animation-delay:1.2s"><rect x="346" y="226" width="64" height="34" rx="17" fill="#fff" stroke="#e2e8f0"/><text x="378" y="249" text-anchor="middle" font-size="15" font-weight="700" fill="#7c3aed" font-family="JetBrains Mono, monospace">IoT</text></g>
+  <g class="float" style="animation-delay:1.8s"><rect x="4" y="330" width="80" height="34" rx="17" fill="#fff" stroke="#e2e8f0"/><text x="44" y="353" text-anchor="middle" font-size="15" font-weight="700" fill="#f97316" font-family="JetBrains Mono, monospace">V=IR</text></g>
+</script>
+
+<script>
+(function(){
+  // Robot mascot
+  var tpl=document.getElementById('robot-tpl');
+  document.querySelectorAll('svg[data-robot]').forEach(function(s){s.innerHTML=tpl.textContent;});
+  // Chip pins
+  var pins=document.getElementById('pins'),NS='http://www.w3.org/2000/svg',n=0;
+  function pin(x,y,w,h){var r=document.createElementNS(NS,'rect');r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',w);r.setAttribute('height',h);r.setAttribute('rx',2);r.setAttribute('fill','#94a3b8');r.setAttribute('class','pin');r.style.animationDelay=(n++*0.1)+'s';pins.appendChild(r);}
+  for(var i=0;i<6;i++){var o=125+i*32;pin(88,o,22,10);pin(310,o,22,10);pin(o,88,10,22);pin(o,310,10,22);}
+
+  var slides=[].slice.call(document.querySelectorAll('.slide')),stage=document.getElementById('stage'),
+      count=document.getElementById('count'),bar=document.querySelector('#progress i'),cur=0,idleT;
+  function fit(){var s=Math.min(innerWidth/1280,innerHeight/720);stage.style.transform='translate(-50%,-50%) scale('+s+')';}
+  function go(i){
+    i=Math.max(0,Math.min(slides.length-1,i));
+    slides.forEach(function(el,k){el.classList.toggle('active',k===i);});
+    cur=i;count.textContent=(i+1)+' / '+slides.length;
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    try{history.replaceState(null,'','#'+(i+1));}catch(e){}
+  }
+  function fs(){
+    var d=document,e=d.documentElement;
+    if(!(d.fullscreenElement||d.webkitFullscreenElement)){(e.requestFullscreen||e.webkitRequestFullscreen||function(){}).call(e);}
+    else{(d.exitFullscreen||d.webkitExitFullscreen||function(){}).call(d);}
+  }
+  addEventListener('keydown',function(e){
+    var k=e.key;
+    if(e.ctrlKey||e.metaKey||e.altKey)return;
+    if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].indexOf(k)>-1){e.preventDefault();go(cur+1);}
+    else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].indexOf(k)>-1){e.preventDefault();go(cur-1);}
+    else if(k==='Home'){go(0);}else if(k==='End'){go(slides.length-1);}
+    else if(k==='f'||k==='F'){fs();}
+  });
+  document.getElementById('next').onclick=function(){go(cur+1);};
+  document.getElementById('prev').onclick=function(){go(cur-1);};
+  document.getElementById('fs').onclick=fs;
+  document.querySelectorAll('#ctrl button').forEach(function(b){b.addEventListener('mousedown',function(e){e.preventDefault();});});
+  var tx=null;
+  addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
+  addEventListener('touchend',function(e){if(tx===null)return;var dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)go(cur+(dx<0?1:-1));tx=null;},{passive:true});
+  function fsState(){document.body.classList.toggle('fs',!!(document.fullscreenElement||document.webkitFullscreenElement));wake();setTimeout(fit,60);}
+  function wake(){document.body.classList.remove('idle');clearTimeout(idleT);idleT=setTimeout(function(){document.body.classList.add('idle');},2500);}
+  document.addEventListener('fullscreenchange',fsState);document.addEventListener('webkitfullscreenchange',fsState);
+  addEventListener('mousemove',wake);addEventListener('resize',fit);
+  fit();
+  var h=parseInt((location.hash||'').slice(1),10);
+  go(h>0?h-1:0);wake();
+})();
+</script>
+</body>
+</html>
